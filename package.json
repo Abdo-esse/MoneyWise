@@ -1,0 +1,47 @@
+{
+  "name": "moneywise",
+  "version": "1.0.0",
+  "description": "Application web full-stack pour la gestion des finances personnelles (transactions, budgets, épargne, visualisation et notifications).",
+  "main": "src/app.js",
+  "scripts": {
+    "start": "node src/app.js",
+    "dev": "nodemon src/app.js",
+    "lint": "eslint src/**/*.js",
+    "migrate": "npx sequelize-cli db:migrate",
+    "seed": "npx sequelize-cli db:seed:all",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Abdo-esse/MoneyWise.git"
+  },
+  "keywords": [
+    "finance",
+    "budget",
+    "expense-tracker",
+    "nodejs",
+    "express",
+    "mysql",
+    "moneywise"
+  ],
+  "author": "Abel Ilah ESSEMLALI",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Abdo-esse/MoneyWise/issues"
+  },
+  "homepage": "https://github.com/Abdo-esse/MoneyWise#readme",
+  "dependencies": {
+    "dotenv": "^17.2.2",
+    "express": "^5.1.0",
+    "mysql2": "^3.15.0",
+    "sequelize": "^6.37.7",
+    "winston": "^3.17.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.36.0",
+    "eslint": "^9.36.0",
+    "globals": "^16.4.0",
+    "nodemon": "^3.1.10",
+    "sequelize-cli": "^6.6.3"
+  }
+}
