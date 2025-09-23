@@ -21,7 +21,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 
 
-// Test DB
+// connection db
 (async () => {
   try {
     await sequelize.authenticate();
@@ -34,4 +34,12 @@ app.use(express.static(path.join(__dirname, 'public')));
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   logger.info(`Server running in ${process.env.NODE_ENV} mode on port ${PORT}`);
+});
+
+app.get('/', (req, res) => {
+  res.redirect('/home'); // redirige vers /home
+});
+
+app.get('/home', (req, res) => {
+  res.render('home'); // va chercher views/home.ejs
 });

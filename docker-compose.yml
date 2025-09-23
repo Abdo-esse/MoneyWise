@@ -21,7 +21,7 @@ services:
     volumes:
       - ./:/usr/src/app
     ports:
-      - "${PORT}:3000"
+      - "${PORT}:${PORT}"
     depends_on:
       - db
     env_file:

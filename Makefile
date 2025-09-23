@@ -8,6 +8,10 @@ NPM=npm
 up:
 	$(DOCKER_COMPOSE) up -d
 
+#build
+build:
+	$(DOCKER_COMPOSE) up --build -d
+
 # Arrêter et supprimer tous les containers
 down:
 	$(DOCKER_COMPOSE) down
