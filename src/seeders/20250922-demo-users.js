@@ -1,6 +1,6 @@
 'use strict';
-const { v4: uuidv4 } = require('uuid');
-const bcrypt = require('bcrypt');
+import { v4 as uuidv4} from 'uuid'
+import bcrypt from 'bcrypt'
 
 module.exports = {
   async up(queryInterface) {
@@ -11,7 +11,7 @@ module.exports = {
         id: uuidv4(),
         name: `user${i}`,
         email: `user${i}@example.com`,
-        password: await bcrypt.hash('password123', 10), // mot de passe crypté
+        password: await bcrypt.hash('password123', 10), 
         createdAt: new Date(),
         updatedAt: new Date(),
       });

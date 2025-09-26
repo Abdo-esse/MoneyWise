@@ -4,6 +4,11 @@ import { sequelize } from './config/database.js';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import logger from './utils/logger.js';
+import { renderHome, renderAbout } from './controllers/page.controller.js';
+import expressLayouts from "express-ejs-layouts";
+import {renderLogin} from "./controllers/auth/login.controller.js"
+import {renderForgotPassword} from "./controllers/auth/forgotPassword.controller.js"
+import {renderSignup} from "./controllers/auth/signUp.controller.js"
 
 dotenv.config();
 const app = express();
@@ -13,15 +18,15 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
+app.use(expressLayouts);
+app.set("layout", "layout/main"); 
 
 // Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
 
-
-
-// connection db
+// Connection DB
 (async () => {
   try {
     await sequelize.authenticate();
@@ -31,15 +36,21 @@ app.use(express.static(path.join(__dirname, 'public')));
   }
 })();
 
+// Routes
+app.get('/', (req, res) => {
+  res.redirect('/home');
+});
+
+app.get('/home', renderHome);
+app.get('/about', renderAbout);
+app.get('/tests', renderHome);
+app.get('/auth/login',renderLogin)
+app.get('/auth/signup',renderSignup)
+app.get('/auth/forgot-password',renderForgotPassword)
+// Lancer le serveur
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   logger.info(`Server running in ${process.env.NODE_ENV} mode on port ${PORT}`);
 });
 
-app.get('/', (req, res) => {
-  res.redirect('/home'); // redirige vers /home
-});
 
-app.get('/home', (req, res) => {
-  res.render('home'); // va chercher views/home.ejs
-});

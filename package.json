@@ -36,6 +36,7 @@
     "dotenv": "^17.2.2",
     "ejs": "^3.1.10",
     "express": "^5.1.0",
+    "express-ejs-layouts": "^2.5.1",
     "mysql2": "^3.15.0",
     "sequelize": "^6.37.7",
     "uuid": "^13.0.0",

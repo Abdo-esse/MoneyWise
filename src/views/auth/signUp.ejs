@@ -1,0 +1,254 @@
+<% 
+// Variables pour le layout
+const title = "Inscription - MoneyWise";
+%>
+
+<div class="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-md w-full space-y-8">
+        <!-- Header -->
+        <div class="text-center">
+            <div class="mx-auto h-24 w-24 bg-gradient-to-br from-green-500 to-green-600 rounded-full flex items-center justify-center shadow-lg mb-6">
+                <i class="fas fa-user-plus text-3xl text-white"></i>
+            </div>
+            <h2 class="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2">
+                Créer votre compte
+            </h2>
+            <p class="text-gray-600 dark:text-gray-400">
+                Rejoignez MoneyWise et prenez le contrôle de vos finances
+            </p>
+        </div>
+
+        <!-- Form Card -->
+        <div class="bg-white dark:bg-gray-800 shadow-xl rounded-xl px-8 py-10 border border-gray-200 dark:border-gray-700">
+            <form class="space-y-6" action="/auth/signup" method="POST">
+                <!-- Name -->
+                <div>
+                    <label for="name" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        <i class="fas fa-user mr-2 text-primary-600 dark:text-primary-400"></i>
+                        Nom complet
+                    </label>
+                    <input id="name" name="name" type="text" autocomplete="name" required 
+                           class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 transition-colors"
+                           placeholder="Jean Dupont">
+                </div>
+
+                <!-- Email -->
+                <div>
+                    <label for="email" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        <i class="fas fa-envelope mr-2 text-primary-600 dark:text-primary-400"></i>
+                        Adresse email
+                    </label>
+                    <input id="email" name="email" type="email" autocomplete="email" required 
+                           class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 transition-colors"
+                           placeholder="jean@exemple.com">
+                </div>
+
+                <!-- Password -->
+                <div>
+                    <label for="password" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        <i class="fas fa-lock mr-2 text-primary-600 dark:text-primary-400"></i>
+                        Mot de passe
+                    </label>
+                    <div class="relative">
+                        <input id="password" name="password" type="password" autocomplete="new-password" required 
+                               class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 transition-colors pr-12"
+                               placeholder="••••••••">
+                        <button type="button" id="toggle-password" class="absolute inset-y-0 right-0 pr-3 flex items-center">
+                            <i class="fas fa-eye text-gray-400 hover:text-gray-600 dark:hover:text-gray-300" id="eye-icon"></i>
+                        </button>
+                    </div>
+                    <!-- Password strength indicator -->
+                    <div class="mt-2">
+                        <div class="h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+                            <div id="password-strength" class="h-full transition-all duration-300"></div>
+                        </div>
+                        <p id="password-text" class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                            Minimum 8 caractères recommandés
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Confirm Password -->
+                <div>
+                    <label for="confirmPassword" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        <i class="fas fa-lock mr-2 text-primary-600 dark:text-primary-400"></i>
+                        Confirmer le mot de passe
+                    </label>
+                    <div class="relative">
+                        <input id="confirmPassword" name="confirmPassword" type="password" autocomplete="new-password" required 
+                               class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 transition-colors pr-12"
+                               placeholder="••••••••">
+                        <button type="button" id="toggle-confirm-password" class="absolute inset-y-0 right-0 pr-3 flex items-center">
+                            <i class="fas fa-eye text-gray-400 hover:text-gray-600 dark:hover:text-gray-300" id="confirm-eye-icon"></i>
+                        </button>
+                    </div>
+                    <p id="password-match" class="text-xs mt-1 hidden"></p>
+                </div>
+
+                <!-- Terms -->
+                <div class="flex items-start">
+                    <input id="terms" name="terms" type="checkbox" required
+                           class="mt-1 h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700">
+                    <label for="terms" class="ml-2 block text-sm text-gray-700 dark:text-gray-300">
+                        J'accepte les 
+                        <a href="#" class="text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300 transition-colors">conditions d'utilisation</a>
+                        et la 
+                        <a href="#" class="text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300 transition-colors">politique de confidentialité</a>
+                    </label>
+                </div>
+
+                <!-- Submit Button -->
+                <div>
+                    <button type="submit" id="submit-btn"
+                            class="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 dark:focus:ring-offset-gray-800 transition-all duration-200 transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed">
+                        <span class="absolute left-0 inset-y-0 flex items-center pl-3">
+                            <i class="fas fa-user-plus group-hover:text-green-300"></i>
+                        </span>
+                        Créer mon compte
+                    </button>
+                </div>
+
+                <!-- Divider -->
+                <div class="relative my-6">
+                    <div class="absolute inset-0 flex items-center">
+                        <div class="w-full border-t border-gray-300 dark:border-gray-600"></div>
+                    </div>
+                    <div class="relative flex justify-center text-sm">
+                        <span class="px-2 bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400">ou</span>
+                    </div>
+                </div>
+
+                <!-- Login link -->
+                <div class="text-center">
+                    <p class="text-sm text-gray-600 dark:text-gray-400">
+                        Déjà un compte ?
+                        <a href="/auth/login" class="font-medium text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300 transition-colors ml-1">
+                            Se connecter
+                            <i class="fas fa-arrow-right ml-1"></i>
+                        </a>
+                    </p>
+                </div>
+            </form>
+        </div>
+
+        <!-- Benefits -->
+        <div class="bg-gradient-to-r from-primary-50 to-green-50 dark:from-gray-800 dark:to-gray-700 rounded-xl p-6 border border-primary-100 dark:border-gray-600">
+            <h3 class="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-3 flex items-center">
+                <i class="fas fa-star text-yellow-500 mr-2"></i>
+                Pourquoi choisir MoneyWise ?
+            </h3>
+            <div class="grid grid-cols-2 gap-4 text-xs text-gray-600 dark:text-gray-300">
+                <div class="flex items-center">
+                    <i class="fas fa-check text-green-500 mr-2"></i>
+                    100% gratuit
+                </div>
+                <div class="flex items-center">
+                    <i class="fas fa-check text-green-500 mr-2"></i>
+                    Sécurisé
+                </div>
+                <div class="flex items-center">
+                    <i class="fas fa-check text-green-500 mr-2"></i>
+                    Pas de publicité
+                </div>
+                <div class="flex items-center">
+                    <i class="fas fa-check text-green-500 mr-2"></i>
+                    Support 24/7
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Password visibility toggles
+    document.getElementById('toggle-password').addEventListener('click', function() {
+        const passwordField = document.getElementById('password');
+        const eyeIcon = document.getElementById('eye-icon');
+        
+        if (passwordField.type === 'password') {
+            passwordField.type = 'text';
+            eyeIcon.className = 'fas fa-eye-slash text-gray-400 hover:text-gray-600 dark:hover:text-gray-300';
+        } else {
+            passwordField.type = 'password';
+            eyeIcon.className = 'fas fa-eye text-gray-400 hover:text-gray-600 dark:hover:text-gray-300';
+        }
+    });
+
+    document.getElementById('toggle-confirm-password').addEventListener('click', function() {
+        const passwordField = document.getElementById('confirmPassword');
+        const eyeIcon = document.getElementById('confirm-eye-icon');
+        
+        if (passwordField.type === 'password') {
+            passwordField.type = 'text';
+            eyeIcon.className = 'fas fa-eye-slash text-gray-400 hover:text-gray-600 dark:hover:text-gray-300';
+        } else {
+            passwordField.type = 'password';
+            eyeIcon.className = 'fas fa-eye text-gray-400 hover:text-gray-600 dark:hover:text-gray-300';
+        }
+    });
+
+    // Password strength checker
+    document.getElementById('password').addEventListener('input', function() {
+        const password = this.value;
+        const strengthBar = document.getElementById('password-strength');
+        const strengthText = document.getElementById('password-text');
+        
+        let strength = 0;
+        if (password.length >= 8) strength += 25;
+        if (/[a-z]/.test(password)) strength += 25;
+        if (/[A-Z]/.test(password)) strength += 25;
+        if (/[0-9]/.test(password)) strength += 25;
+        
+        strengthBar.style.width = strength + '%';
+        
+        if (strength < 50) {
+            strengthBar.className = 'h-full bg-red-500 transition-all duration-300';
+            strengthText.textContent = 'Mot de passe faible';
+            strengthText.className = 'text-xs text-red-500 mt-1';
+        } else if (strength < 75) {
+            strengthBar.className = 'h-full bg-yellow-500 transition-all duration-300';
+            strengthText.textContent = 'Mot de passe moyen';
+            strengthText.className = 'text-xs text-yellow-500 mt-1';
+        } else {
+            strengthBar.className = 'h-full bg-green-500 transition-all duration-300';
+            strengthText.textContent = 'Mot de passe fort';
+            strengthText.className = 'text-xs text-green-500 mt-1';
+        }
+    });
+
+    // Password confirmation checker
+    document.getElementById('confirmPassword').addEventListener('input', function() {
+        const password = document.getElementById('password').value;
+        const confirmPassword = this.value;
+        const matchText = document.getElementById('password-match');
+        
+        if (confirmPassword.length > 0) {
+            matchText.classList.remove('hidden');
+            if (password === confirmPassword) {
+                matchText.textContent = 'Les mots de passe correspondent';
+                matchText.className = 'text-xs text-green-500 mt-1';
+            } else {
+                matchText.textContent = 'Les mots de passe ne correspondent pas';
+                matchText.className = 'text-xs text-red-500 mt-1';
+            }
+        } else {
+            matchText.classList.add('hidden');
+        }
+    });
+
+    // Form validation
+    document.querySelector('form').addEventListener('submit', function(e) {
+        const password = document.getElementById('password').value;
+        const confirmPassword = document.getElementById('confirmPassword').value;
+        const submitBtn = document.getElementById('submit-btn');
+        
+        if (password !== confirmPassword) {
+            e.preventDefault();
+            alert('Les mots de passe ne correspondent pas');
+            return;
+        }
+        
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Création du compte...';
+        submitBtn.disabled = true;
+    });
+</script>
