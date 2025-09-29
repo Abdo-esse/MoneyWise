@@ -108,7 +108,13 @@ const title = "Inscription - MoneyWise";
                         </span>
                         Créer mon compte
                     </button>
-                </div>
+                    </div>
+                        <% if (typeof error !== "undefined") { %>
+                            <div class="mb-4 p-3 rounded-lg bg-red-100 border border-red-300 text-red-700 text-sm">
+                                <i class="fas fa-exclamation-circle mr-2"></i>
+                                <%= error %>
+                            </div>
+                        <% } %>
 
                 <!-- Divider -->
                 <div class="relative my-6">

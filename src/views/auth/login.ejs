@@ -20,6 +20,13 @@ const title = "Connexion - MoneyWise";
 
         <!-- Form Card -->
         <div class="bg-white dark:bg-gray-800 shadow-xl rounded-xl px-8 py-10 border border-gray-200 dark:border-gray-700">
+            <!-- Success message -->
+            <% if (typeof success !== "undefined") { %>
+            <div class="mb-4 p-3 rounded-lg bg-green-100 border border-green-300 text-green-700 text-sm">
+                <i class="fas fa-check-circle mr-2"></i>
+                <%= success %>
+            </div>
+            <% } %>
             <form class="space-y-6" action="/auth/login" method="POST">
                 <!-- Email -->
                 <div>
@@ -110,24 +117,75 @@ const title = "Connexion - MoneyWise";
 </div>
 
 <script>
-    // Toggle password visibility
-    document.getElementById('toggle-password').addEventListener('click', function() {
-        const passwordField = document.getElementById('password');
-        const eyeIcon = document.getElementById('eye-icon');
-        
-        if (passwordField.type === 'password') {
-            passwordField.type = 'text';
-            eyeIcon.className = 'fas fa-eye-slash text-gray-400 hover:text-gray-600 dark:hover:text-gray-300';
-        } else {
-            passwordField.type = 'password';
-            eyeIcon.className = 'fas fa-eye text-gray-400 hover:text-gray-600 dark:hover:text-gray-300';
-        }
-    });
+const form = document.querySelector('form');
+const emailInput = document.getElementById('email');
+const passwordInput = document.getElementById('password');
 
-    // Form validation feedback
-    document.querySelector('form').addEventListener('submit', function(e) {
-        const submitBtn = document.querySelector('button[type="submit"]');
+// Créer des paragraphes pour afficher les erreurs
+const emailError = document.createElement('p');
+emailError.className = 'text-xs mt-1 text-red-600 hidden';
+emailInput.parentNode.appendChild(emailError);
+
+const passwordError = document.createElement('p');
+passwordError.className = 'text-xs mt-1 text-red-600 hidden';
+passwordInput.parentNode.appendChild(passwordError);
+
+// Fonction de validation email
+function validateEmail() {
+    const value = emailInput.value.trim();
+    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!value) {
+        emailError.textContent = 'L’email est requis';
+        emailError.classList.remove('hidden');
+        emailInput.classList.add('border-red-500');
+        emailInput.classList.remove('border-green-500');
+        return false;
+    } else if (!regex.test(value)) {
+        emailError.textContent = 'Email invalide';
+        emailError.classList.remove('hidden');
+        emailInput.classList.add('border-red-500');
+        emailInput.classList.remove('border-green-500');
+        return false;
+    } else {
+        emailError.classList.add('hidden');
+        emailInput.classList.remove('border-red-500');
+        emailInput.classList.add('border-green-500');
+        return true;
+    }
+}
+
+// Fonction de validation password
+function validatePassword() {
+    const value = passwordInput.value.trim();
+    if (!value) {
+        passwordError.textContent = 'Le mot de passe est requis';
+        passwordError.classList.remove('hidden');
+        passwordInput.classList.add('border-red-500');
+        passwordInput.classList.remove('border-green-500');
+        return false;
+    } else {
+        passwordError.classList.add('hidden');
+        passwordInput.classList.remove('border-red-500');
+        passwordInput.classList.add('border-green-500');
+        return true;
+    }
+}
+
+// Validation en temps réel
+emailInput.addEventListener('input', validateEmail);
+passwordInput.addEventListener('input', validatePassword);
+
+// Validation au submit
+form.addEventListener('submit', function(e) {
+    const isEmailValid = validateEmail();
+    const isPasswordValid = validatePassword();
+
+    if (!isEmailValid || !isPasswordValid) {
+        e.preventDefault(); // Empêche l'envoi si invalide
+    } else {
+        const submitBtn = form.querySelector('button[type="submit"]');
         submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Connexion...';
         submitBtn.disabled = true;
-    });
+    }
+});
 </script>

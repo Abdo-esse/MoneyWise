@@ -6,9 +6,8 @@ import { fileURLToPath } from 'url';
 import logger from './utils/logger.js';
 import { renderHome, renderAbout } from './controllers/page.controller.js';
 import expressLayouts from "express-ejs-layouts";
-import {renderLogin} from "./controllers/auth/login.controller.js"
 import {renderForgotPassword} from "./controllers/auth/forgotPassword.controller.js"
-import {renderSignup} from "./controllers/auth/signUp.controller.js"
+import authRoutes from './routes/auth.routes.js';
 
 dotenv.config();
 const app = express();
@@ -41,11 +40,10 @@ app.get('/', (req, res) => {
   res.redirect('/home');
 });
 
+app.use('/auth', authRoutes);
 app.get('/home', renderHome);
 app.get('/about', renderAbout);
 app.get('/tests', renderHome);
-app.get('/auth/login',renderLogin)
-app.get('/auth/signup',renderSignup)
 app.get('/auth/forgot-password',renderForgotPassword)
 // Lancer le serveur
 const PORT = process.env.PORT || 3000;

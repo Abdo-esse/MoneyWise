@@ -1,10 +1,10 @@
 'use strict';
-import { Model } from 'sequelize';
+// src/models/user.js
+import { Model, DataTypes } from 'sequelize';
 
-module.exports = (sequelize, DataTypes) => {
+export default (sequelize) => {
   class User extends Model {
     static associate(models) {
-      // Associations avec d'autres tables
       User.hasMany(models.Transaction, { foreignKey: 'user_id' });
       User.hasMany(models.Category, { foreignKey: 'user_id' });
       User.hasMany(models.Budget, { foreignKey: 'user_id' });
