@@ -20,12 +20,19 @@ const title = "Connexion - MoneyWise";
 
         <!-- Form Card -->
         <div class="bg-white dark:bg-gray-800 shadow-xl rounded-xl px-8 py-10 border border-gray-200 dark:border-gray-700">
-            <!-- Success message -->
-            <% if (typeof success !== "undefined") { %>
-            <div class="mb-4 p-3 rounded-lg bg-green-100 border border-green-300 text-green-700 text-sm">
-                <i class="fas fa-check-circle mr-2"></i>
-                <%= success %>
-            </div>
+                <!-- Success message -->
+            <% if (success && success.length > 0) { %>
+                <div class="mb-4 p-3 rounded-lg bg-green-100 border border-green-300 text-green-700 text-sm">
+                    <i class="fas fa-check-circle mr-2"></i>
+                    <%= success %>
+                </div>
+            <% } %>
+
+            <% if (error && error.length > 0) { %>
+                <div class="mb-4 p-3 rounded-lg bg-red-100 border border-red-300 text-red-700 text-sm">
+                    <i class="fas fa-exclamation-circle mr-2"></i>
+                    <%= error %>
+                </div>
             <% } %>
             <form class="space-y-6" action="/auth/login" method="POST">
                 <!-- Email -->

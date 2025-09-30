@@ -10,11 +10,11 @@ export class SignUpController {
 
   handleSignup = async (req, res) => {
     try {
-      const { email, password, name } = req.body;
+      const { email, password, full_name } = req.body;
       await this.userService.register({
         email,
         password,
-        name,
+        full_name,
       });
 
       res.render("auth/login", { success: "Compte créé, connectez-vous" });

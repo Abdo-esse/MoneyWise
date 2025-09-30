@@ -1,0 +1,433 @@
+<!-- views/dashboard/index.ejs -->
+<% 
+const title = "Vue d'ensemble - Dashboard MoneyWise";
+const pageTitle = "Vue d'ensemble";
+%>
+
+<!-- Stats Cards -->
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+    <!-- Solde Total -->
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+        <div class="flex items-center justify-between">
+            <div>
+                <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Solde Total</p>
+                <p class="text-2xl font-bold text-gray-900 dark:text-gray-100 mt-1">2,450.75 €</p>
+                <p class="text-xs text-green-600 dark:text-green-400 mt-1">
+                    <i class="fas fa-arrow-up mr-1"></i>+5.2% ce mois
+                </p>
+            </div>
+            <div class="w-12 h-12 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center">
+                <i class="fas fa-wallet text-blue-600 dark:text-blue-400"></i>
+            </div>
+        </div>
+    </div>
+
+    <!-- Revenus -->
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+        <div class="flex items-center justify-between">
+            <div>
+                <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Revenus ce mois</p>
+                <p class="text-2xl font-bold text-green-600 dark:text-green-400 mt-1">+3,200.00 €</p>
+                <p class="text-xs text-green-600 dark:text-green-400 mt-1">
+                    <i class="fas fa-arrow-up mr-1"></i>+2.1% vs mois dernier
+                </p>
+            </div>
+            <div class="w-12 h-12 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center">
+                <i class="fas fa-arrow-up text-green-600 dark:text-green-400"></i>
+            </div>
+        </div>
+    </div>
+
+    <!-- Dépenses -->
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+        <div class="flex items-center justify-between">
+            <div>
+                <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Dépenses ce mois</p>
+                <p class="text-2xl font-bold text-red-600 dark:text-red-400 mt-1">-1,850.25 €</p>
+                <p class="text-xs text-red-600 dark:text-red-400 mt-1">
+                    <i class="fas fa-arrow-down mr-1"></i>+8.3% vs mois dernier
+                </p>
+            </div>
+            <div class="w-12 h-12 bg-red-100 dark:bg-red-900/30 rounded-full flex items-center justify-center">
+                <i class="fas fa-arrow-down text-red-600 dark:text-red-400"></i>
+            </div>
+        </div>
+    </div>
+
+    <!-- Épargne -->
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+        <div class="flex items-center justify-between">
+            <div>
+                <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Épargne</p>
+                <p class="text-2xl font-bold text-purple-600 dark:text-purple-400 mt-1">8,950.50 €</p>
+                <p class="text-xs text-purple-600 dark:text-purple-400 mt-1">
+                    <i class="fas fa-piggy-bank mr-1"></i>73% objectif annuel
+                </p>
+            </div>
+            <div class="w-12 h-12 bg-purple-100 dark:bg-purple-900/30 rounded-full flex items-center justify-center">
+                <i class="fas fa-piggy-bank text-purple-600 dark:text-purple-400"></i>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Charts Section -->
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+    <!-- Graphique Revenus/Dépenses -->
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+        <div class="flex items-center justify-between mb-6">
+            <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100">Évolution mensuelle</h3>
+            <div class="flex space-x-2">
+                <button class="px-3 py-1 text-xs font-medium text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-900/20 rounded-full">
+                    6 mois
+                </button>
+                <button class="px-3 py-1 text-xs font-medium text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full">
+                    1 an
+                </button>
+            </div>
+        </div>
+        <div class="h-64">
+            <canvas id="monthlyChart"></canvas>
+        </div>
+    </div>
+
+    <!-- Graphique Répartition par Catégorie -->
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+        <div class="flex items-center justify-between mb-6">
+            <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100">Dépenses par catégorie</h3>
+            <select class="text-sm border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-1 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
+                <option>Ce mois</option>
+                <option>Mois dernier</option>
+                <option>Cette année</option>
+            </select>
+        </div>
+        <div class="h-64">
+            <canvas id="categoryChart"></canvas>
+        </div>
+    </div>
+</div>
+
+<!-- Budgets et Objectifs -->
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+    <!-- Budgets -->
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+        <div class="flex items-center justify-between mb-6">
+            <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100">Budgets du mois</h3>
+            <a href="/dashboard/budgets" class="text-sm text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300">
+                Voir tous <i class="fas fa-arrow-right ml-1"></i>
+            </a>
+        </div>
+        <div class="space-y-4">
+            <!-- Budget Alimentation -->
+            <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
+                <div class="flex items-center justify-between mb-2">
+                    <span class="text-sm font-medium text-gray-900 dark:text-gray-100">🍽️ Alimentation</span>
+                    <span class="text-sm text-gray-600 dark:text-gray-400">450€ / 600€</span>
+                </div>
+                <div class="w-full bg-gray-200 dark:bg-gray-600 rounded-full h-2">
+                    <div class="bg-green-600 h-2 rounded-full" style="width: 75%"></div>
+                </div>
+                <p class="text-xs text-green-600 dark:text-green-400 mt-1">25% restant</p>
+            </div>
+
+            <!-- Budget Transport -->
+            <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
+                <div class="flex items-center justify-between mb-2">
+                    <span class="text-sm font-medium text-gray-900 dark:text-gray-100">🚗 Transport</span>
+                    <span class="text-sm text-gray-600 dark:text-gray-400">320€ / 300€</span>
+                </div>
+                <div class="w-full bg-gray-200 dark:bg-gray-600 rounded-full h-2">
+                    <div class="bg-red-600 h-2 rounded-full" style="width: 100%"></div>
+                </div>
+                <p class="text-xs text-red-600 dark:text-red-400 mt-1">Dépassé de 20€</p>
+            </div>
+
+            <!-- Budget Loisirs -->
+            <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
+                <div class="flex items-center justify-between mb-2">
+                    <span class="text-sm font-medium text-gray-900 dark:text-gray-100">🎭 Loisirs</span>
+                    <span class="text-sm text-gray-600 dark:text-gray-400">180€ / 250€</span>
+                </div>
+                <div class="w-full bg-gray-200 dark:bg-gray-600 rounded-full h-2">
+                    <div class="bg-yellow-600 h-2 rounded-full" style="width: 72%"></div>
+                </div>
+                <p class="text-xs text-yellow-600 dark:text-yellow-400 mt-1">28% restant</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Objectifs -->
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+        <div class="flex items-center justify-between mb-6">
+            <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100">Objectifs d'épargne</h3>
+            <a href="/dashboard/objectives" class="text-sm text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300">
+                Voir tous <i class="fas fa-arrow-right ml-1"></i>
+            </a>
+        </div>
+        <div class="space-y-4">
+            <!-- Vacances -->
+            <div class="bg-gradient-to-r from-blue-50 to-cyan-50 dark:from-blue-900/20 dark:to-cyan-900/20 rounded-lg p-4 border border-blue-200 dark:border-blue-800">
+                <div class="flex items-center justify-between mb-2">
+                    <span class="text-sm font-medium text-gray-900 dark:text-gray-100">🏖️ Vacances d'été</span>
+                    <span class="text-sm text-blue-600 dark:text-blue-400 font-semibold">2,100€ / 3,000€</span>
+                </div>
+                <div class="w-full bg-white/50 dark:bg-gray-600 rounded-full h-3">
+                    <div class="bg-gradient-to-r from-blue-600 to-cyan-600 h-3 rounded-full" style="width: 70%"></div>
+                </div>
+                <p class="text-xs text-blue-600 dark:text-blue-400 mt-2">70% - Plus que 900€ !</p>
+            </div>
+
+            <!-- Voiture -->
+            <div class="bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 rounded-lg p-4 border border-green-200 dark:border-green-800">
+                <div class="flex items-center justify-between mb-2">
+                    <span class="text-sm font-medium text-gray-900 dark:text-gray-100">🚙 Nouvelle voiture</span>
+                    <span class="text-sm text-green-600 dark:text-green-400 font-semibold">12,500€ / 20,000€</span>
+                </div>
+                <div class="w-full bg-white/50 dark:bg-gray-600 rounded-full h-3">
+                    <div class="bg-gradient-to-r from-green-600 to-emerald-600 h-3 rounded-full" style="width: 62.5%"></div>
+                </div>
+                <p class="text-xs text-green-600 dark:text-green-400 mt-2">62% - Bon rythme !</p>
+            </div>
+
+            <!-- Urgence -->
+            <div class="bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 rounded-lg p-4 border border-purple-200 dark:border-purple-800">
+                <div class="flex items-center justify-between mb-2">
+                    <span class="text-sm font-medium text-gray-900 dark:text-gray-100">🚨 Fonds d'urgence</span>
+                    <span class="text-sm text-purple-600 dark:text-purple-400 font-semibold">4,800€ / 6,000€</span>
+                </div>
+                <div class="w-full bg-white/50 dark:bg-gray-600 rounded-full h-3">
+                    <div class="bg-gradient-to-r from-purple-600 to-pink-600 h-3 rounded-full" style="width: 80%"></div>
+                </div>
+                <p class="text-xs text-purple-600 dark:text-purple-400 mt-2">80% - Presque terminé !</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Transactions Récentes -->
+<div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
+    <div class="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
+        <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100">Transactions récentes</h3>
+        <a href="/dashboard/transactions" class="text-sm text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300">
+            Voir toutes <i class="fas fa-arrow-right ml-1"></i>
+        </a>
+    </div>
+    <div class="divide-y divide-gray-200 dark:divide-gray-700">
+        <!-- Transaction 1 -->
+        <div class="p-6 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-4">
+                    <div class="w-10 h-10 bg-red-100 dark:bg-red-900/30 rounded-full flex items-center justify-center">
+                        <i class="fas fa-shopping-cart text-red-600 dark:text-red-400"></i>
+                    </div>
+                    <div>
+                        <p class="text-sm font-medium text-gray-900 dark:text-gray-100">Carrefour Market</p>
+                        <p class="text-xs text-gray-600 dark:text-gray-400">Alimentation • Aujourd'hui 14:30</p>
+                    </div>
+                </div>
+                <div class="text-right">
+                    <p class="text-sm font-semibold text-red-600 dark:text-red-400">-45.67 €</p>
+                    <p class="text-xs text-gray-600 dark:text-gray-400">Carte</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Transaction 2 -->
+        <div class="p-6 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-4">
+                    <div class="w-10 h-10 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center">
+                        <i class="fas fa-university text-green-600 dark:text-green-400"></i>
+                    </div>
+                    <div>
+                        <p class="text-sm font-medium text-gray-900 dark:text-gray-100">Salaire Janvier</p>
+                        <p class="text-xs text-gray-600 dark:text-gray-400">Virement • Hier 09:00</p>
+                    </div>
+                </div>
+                <div class="text-right">
+                    <p class="text-sm font-semibold text-green-600 dark:text-green-400">+2,850.00 €</p>
+                    <p class="text-xs text-gray-600 dark:text-gray-400">Virement</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Transaction 3 -->
+        <div class="p-6 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-4">
+                    <div class="w-10 h-10 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center">
+                        <i class="fas fa-gas-pump text-blue-600 dark:text-blue-400"></i>
+                    </div>
+                    <div>
+                        <p class="text-sm font-medium text-gray-900 dark:text-gray-100">Station Total</p>
+                        <p class="text-xs text-gray-600 dark:text-gray-400">Transport • 28 jan 18:45</p>
+                    </div>
+                </div>
+                <div class="text-right">
+                    <p class="text-sm font-semibold text-red-600 dark:text-red-400">-62.30 €</p>
+                    <p class="text-xs text-gray-600 dark:text-gray-400">Carte</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Transaction 4 -->
+        <div class="p-6 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-4">
+                    <div class="w-10 h-10 bg-purple-100 dark:bg-purple-900/30 rounded-full flex items-center justify-center">
+                        <i class="fas fa-film text-purple-600 dark:text-purple-400"></i>
+                    </div>
+                    <div>
+                        <p class="text-sm font-medium text-gray-900 dark:text-gray-100">Netflix</p>
+                        <p class="text-xs text-gray-600 dark:text-gray-400">Loisirs • 27 jan 12:00</p>
+                    </div>
+                </div>
+                <div class="text-right">
+                    <p class="text-sm font-semibold text-red-600 dark:text-red-400">-15.99 €</p>
+                    <p class="text-xs text-gray-600 dark:text-gray-400">Prélèvement</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Transaction 5 -->
+        <div class="p-6 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-4">
+                    <div class="w-10 h-10 bg-yellow-100 dark:bg-yellow-900/30 rounded-full flex items-center justify-center">
+                        <i class="fas fa-piggy-bank text-yellow-600 dark:text-yellow-400"></i>
+                    </div>
+                    <div>
+                        <p class="text-sm font-medium text-gray-900 dark:text-gray-100">Épargne Vacances</p>
+                        <p class="text-xs text-gray-600 dark:text-gray-400">Virement • 25 jan 08:00</p>
+                    </div>
+                </div>
+                <div class="text-right">
+                    <p class="text-sm font-semibold text-blue-600 dark:text-blue-400">-200.00 €</p>
+                    <p class="text-xs text-gray-600 dark:text-gray-400">Épargne</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Données pour les graphiques
+const monthlyData = {
+    labels: ['Août', 'Sept', 'Oct', 'Nov', 'Déc', 'Jan'],
+    datasets: [{
+        label: 'Revenus',
+        data: [3100, 3200, 3150, 3300, 3250, 3200],
+        borderColor: 'rgb(34, 197, 94)',
+        backgroundColor: 'rgba(34, 197, 94, 0.1)',
+        tension: 0.4
+    }, {
+        label: 'Dépenses',
+        data: [1800, 1900, 2100, 1950, 2000, 1850],
+        borderColor: 'rgb(239, 68, 68)',
+        backgroundColor: 'rgba(239, 68, 68, 0.1)',
+        tension: 0.4
+    }]
+};
+
+const categoryData = {
+    labels: ['Alimentation', 'Transport', 'Loisirs', 'Santé', 'Logement', 'Autres'],
+    datasets: [{
+        data: [450, 320, 180, 120, 600, 180],
+        backgroundColor: [
+            'rgb(34, 197, 94)',
+            'rgb(59, 130, 246)',
+            'rgb(168, 85, 247)',
+            'rgb(249, 115, 22)',
+            'rgb(239, 68, 68)',
+            'rgb(156, 163, 175)'
+        ],
+        borderWidth: 0
+    }]
+};
+
+// Configuration des graphiques
+const chartOptions = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+        legend: {
+            labels: {
+                usePointStyle: true,
+                font: {
+                    size: 12
+                },
+                color: document.documentElement.classList.contains('dark') ? '#e5e7eb' : '#374151'
+            }
+        }
+    },
+    scales: {
+        y: {
+            beginAtZero: true,
+            grid: {
+                color: document.documentElement.classList.contains('dark') ? '#374151' : '#f3f4f6'
+            },
+            ticks: {
+                color: document.documentElement.classList.contains('dark') ? '#9ca3af' : '#6b7280'
+            }
+        },
+        x: {
+            grid: {
+                display: false
+            },
+            ticks: {
+                color: document.documentElement.classList.contains('dark') ? '#9ca3af' : '#6b7280'
+            }
+        }
+    }
+};
+
+// Initialiser les graphiques
+document.addEventListener('DOMContentLoaded', function() {
+    // Graphique mensuel
+    const monthlyCtx = document.getElementById('monthlyChart').getContext('2d');
+    new Chart(monthlyCtx, {
+        type: 'line',
+        data: monthlyData,
+        options: chartOptions
+    });
+
+    // Graphique catégories
+    const categoryCtx = document.getElementById('categoryChart').getContext('2d');
+    new Chart(categoryCtx, {
+        type: 'doughnut',
+        data: categoryData,
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        usePointStyle: true,
+                        padding: 20,
+                        font: {
+                            size: 12
+                        },
+                        color: document.documentElement.classList.contains('dark') ? '#e5e7eb' : '#374151'
+                    }
+                }
+            }
+        }
+    });
+
+    // Mise à jour des couleurs des graphiques lors du changement de thème
+    const observer = new MutationObserver(function(mutations) {
+        mutations.forEach(function(mutation) {
+            if (mutation.attributeName === 'class') {
+                // Recharger les graphiques avec les nouvelles couleurs
+                location.reload();
+            }
+        });
+    });
+
+    observer.observe(document.documentElement, {
+        attributes: true,
+        attributeFilter: ['class']
+    });
+});
+</script>

@@ -27,7 +27,7 @@ const title = "Inscription - MoneyWise";
                         <i class="fas fa-user mr-2 text-primary-600 dark:text-primary-400"></i>
                         Nom complet
                     </label>
-                    <input id="name" name="name" type="text" autocomplete="name" 
+                    <input id="name" name="full_name" type="text" autocomplete="name" 
                            class="w-full px-4 py-3 border dark: rounded-lg focus:ring-2 focus:ring-primary-500 focus: bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 transition-colors"
                            placeholder="Jean Dupont">
                     <p id="name-error" class="text-xs mt-1 hidden"></p>
@@ -109,7 +109,7 @@ const title = "Inscription - MoneyWise";
                         Créer mon compte
                     </button>
                     </div>
-                        <% if (typeof error !== "undefined") { %>
+                        <% if (typeof error !== "undefined" && error.length > 0) { %>
                             <div class="mb-4 p-3 rounded-lg bg-red-100 border border-red-300 text-red-700 text-sm">
                                 <i class="fas fa-exclamation-circle mr-2"></i>
                                 <%= error %>
