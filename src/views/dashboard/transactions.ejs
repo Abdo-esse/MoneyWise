@@ -1,0 +1,682 @@
+<!-- views/dashboard/transactions.ejs -->
+<% 
+const title = "Transactions - Dashboard MoneyWise";
+const pageTitle = "Transactions";
+%>
+
+<!-- Header avec bouton d'ajout -->
+<div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8">
+    <div>
+        <h1 class="text-2xl font-bold text-gray-900 dark:text-gray-100">Transactions</h1>
+        <p class="text-gray-600 dark:text-gray-400 mt-1">Gérez vos revenus et dépenses</p>
+    </div>
+    <button id="addTransactionBtn" class="mt-4 sm:mt-0 px-6 py-3 bg-primary-600 hover:bg-primary-700 text-white rounded-lg font-medium transition-colors flex items-center">
+        <i class="fas fa-plus mr-2"></i>
+        Nouvelle transaction
+    </button>
+</div>
+
+<!-- Filtres et Recherche -->
+<div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 mb-8">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <!-- Recherche -->
+        <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Rechercher</label>
+            <div class="relative">
+                <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                <input type="text" id="searchInput" placeholder="Nom, description..." 
+                       class="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
+            </div>
+        </div>
+
+        <!-- Catégorie -->
+        <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Catégorie</label>
+            <select id="categoryFilter" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
+                <option value="">Toutes les catégories</option>
+                <option value="alimentation">Alimentation</option>
+                <option value="transport">Transport</option>
+                <option value="loisirs">Loisirs</option>
+                <option value="santé">Santé</option>
+                <option value="logement">Logement</option>
+                <option value="salaire">Salaire</option>
+                <option value="autres">Autres</option>
+            </select>
+        </div>
+
+        <!-- Type -->
+        <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Type</label>
+            <select id="typeFilter" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
+                <option value="">Tous</option>
+                <option value="income">Revenus</option>
+                <option value="expense">Dépenses</option>
+            </select>
+        </div>
+
+        <!-- Période -->
+        <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Période</label>
+            <select id="periodFilter" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
+                <option value="all">Toute la période</option>
+                <option value="thisMonth">Ce mois</option>
+                <option value="lastMonth">Mois dernier</option>
+                <option value="thisYear">Cette année</option>
+            </select>
+        </div>
+    </div>
+</div>
+
+<!-- Résumé rapide -->
+<div class="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-8">
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+        <div class="flex items-center">
+            <div class="w-10 h-10 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center mr-4">
+                <i class="fas fa-arrow-up text-green-600 dark:text-green-400"></i>
+            </div>
+            <div>
+                <p class="text-sm text-gray-600 dark:text-gray-400">Revenus</p>
+                <p class="text-lg font-bold text-green-600 dark:text-green-400">+3,200.00 €</p>
+            </div>
+        </div>
+    </div>
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+        <div class="flex items-center">
+            <div class="w-10 h-10 bg-red-100 dark:bg-red-900/30 rounded-full flex items-center justify-center mr-4">
+                <i class="fas fa-arrow-down text-red-600 dark:text-red-400"></i>
+            </div>
+            <div>
+                <p class="text-sm text-gray-600 dark:text-gray-400">Dépenses</p>
+                <p class="text-lg font-bold text-red-600 dark:text-red-400">-1,850.25 €</p>
+            </div>
+        </div>
+    </div>
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+        <div class="flex items-center">
+            <div class="w-10 h-10 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center mr-4">
+                <i class="fas fa-balance-scale text-blue-600 dark:text-blue-400"></i>
+            </div>
+            <div>
+                <p class="text-sm text-gray-600 dark:text-gray-400">Solde</p>
+                <p class="text-lg font-bold text-blue-600 dark:text-blue-400">+1,349.75 €</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Liste des transactions -->
+<div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
+    <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+        <div class="flex items-center justify-between">
+            <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100">Toutes les transactions</h3>
+            <div class="flex items-center space-x-2 text-sm text-gray-600 dark:text-gray-400">
+                <span id="transactionCount">25 transactions</span>
+                <span>•</span>
+                <button id="exportBtn" class="text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300">
+                    <i class="fas fa-download mr-1"></i>Exporter
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div id="transactionsList" class="divide-y divide-gray-200 dark:divide-gray-700">
+        <!-- Transaction items will be rendered here by JavaScript -->
+    </div>
+
+    <!-- Pagination -->
+    <div class="px-6 py-4 border-t border-gray-200 dark:border-gray-700">
+        <div class="flex items-center justify-between">
+            <p class="text-sm text-gray-600 dark:text-gray-400">
+                Affichage de <span id="showingFrom">1</span> à <span id="showingTo">10</span> sur <span id="totalTransactions">25</span> transactions
+            </p>
+            <div class="flex space-x-2">
+                <button id="prevPage" class="px-3 py-1 text-sm bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 rounded hover:bg-gray-200 dark:hover:bg-gray-600 disabled:opacity-50">
+                    Précédent
+                </button>
+                <button id="nextPage" class="px-3 py-1 text-sm bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 rounded hover:bg-gray-200 dark:hover:bg-gray-600 disabled:opacity-50">
+                    Suivant
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Ajouter/Modifier Transaction -->
+<div id="transactionModal" class="fixed inset-0 z-50 hidden overflow-y-auto">
+    <div class="flex items-center justify-center min-h-screen px-4">
+        <div class="fixed inset-0 bg-black bg-opacity-50 transition-opacity"></div>
+        <div class="relative bg-white dark:bg-gray-800 rounded-xl shadow-xl max-w-lg w-full p-6">
+            <div class="flex items-center justify-between mb-6">
+                <h3 id="modalTitle" class="text-lg font-semibold text-gray-900 dark:text-gray-100">Nouvelle transaction</h3>
+                <button id="closeModal" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <form id="transactionForm" class="space-y-4">
+                <!-- Type -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Type *</label>
+                    <div class="grid grid-cols-2 gap-4">
+                        <label class="flex items-center p-3 border border-gray-300 dark:border-gray-600 rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700">
+                            <input type="radio" name="type" value="income" class="mr-2">
+                            <i class="fas fa-arrow-up text-green-600 mr-2"></i>
+                            <span>Revenu</span>
+                        </label>
+                        <label class="flex items-center p-3 border border-gray-300 dark:border-gray-600 rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700">
+                            <input type="radio" name="type" value="expense" class="mr-2" checked>
+                            <i class="fas fa-arrow-down text-red-600 mr-2"></i>
+                            <span>Dépense</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Montant -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Montant *</label>
+                    <div class="relative">
+                        <input type="number" id="amount" name="amount" step="0.01" required
+                               class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 pr-12"
+                               placeholder="0.00">
+                        <span class="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-500 dark:text-gray-400">€</span>
+                    </div>
+                </div>
+
+                <!-- Description -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Description *</label>
+                    <input type="text" id="description" name="description" required
+                           class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                           placeholder="Ex: Courses au supermarché">
+                </div>
+
+                <!-- Catégorie -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Catégorie *</label>
+                    <select id="category" name="category" required
+                            class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
+                        <option value="">Sélectionner une catégorie</option>
+                        <option value="alimentation">🍽️ Alimentation</option>
+                        <option value="transport">🚗 Transport</option>
+                        <option value="loisirs">🎭 Loisirs</option>
+                        <option value="santé">🏥 Santé</option>
+                        <option value="logement">🏠 Logement</option>
+                        <option value="salaire">💼 Salaire</option>
+                        <option value="autres">📦 Autres</option>
+                    </select>
+                </div>
+
+                <!-- Date -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Date *</label>
+                    <input type="date" id="date" name="date" required
+                           class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
+                </div>
+
+                <!-- Boutons -->
+                <div class="flex space-x-4 pt-4">
+                    <button type="button" id="cancelBtn" class="flex-1 px-4 py-3 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                        Annuler
+                    </button>
+                    <button type="submit" id="submitBtn" class="flex-1 px-4 py-3 bg-primary-600 hover:bg-primary-700 text-white rounded-lg font-medium transition-colors">
+                        Enregistrer
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+// Données fictives des transactions
+const transactions = [
+    {id: 1, type: 'expense', amount: 45.67, description: 'Carrefour Market', category: 'alimentation', date: '2024-01-30', icon: 'shopping-cart', color: 'red'},
+    {id: 2, type: 'income', amount: 2850.00, description: 'Salaire Janvier', category: 'salaire', date: '2024-01-29', icon: 'university', color: 'green'},
+    {id: 3, type: 'expense', amount: 62.30, description: 'Station Total', category: 'transport', date: '2024-01-28', icon: 'gas-pump', color: 'blue'},
+    {id: 4, type: 'expense', amount: 15.99, description: 'Netflix', category: 'loisirs', date: '2024-01-27', icon: 'film', color: 'purple'},
+    {id: 5, type: 'expense', amount: 200.00, description: 'Épargne Vacances', category: 'autres', date: '2024-01-25', icon: 'piggy-bank', color: 'yellow'},
+    {id: 6, type: 'expense', amount: 89.50, description: 'Pharmacie', category: 'santé', date: '2024-01-24', icon: 'pills', color: 'orange'},
+    {id: 7, type: 'expense', amount: 125.00, description: 'Restaurant', category: 'loisirs', date: '2024-01-23', icon: 'utensils', color: 'purple'},
+    {id: 8, type: 'expense', amount: 850.00, description: 'Loyer', category: 'logement', date: '2024-01-20', icon: 'home', color: 'red'},
+    // ... plus de transactions fictives
+];
+
+let filteredTransactions = [...transactions];
+let currentPage = 1;
+const itemsPerPage = 10;
+
+// Éléments du DOM
+const transactionsList = document.getElementById('transactionsList');
+const transactionModal = document.getElementById('transactionModal');
+const addTransactionBtn = document.getElementById('addTransactionBtn');
+const closeModal = document.getElementById('closeModal');
+const cancelBtn = document.getElementById('cancelBtn');
+const transactionForm = document.getElementById('transactionForm');
+const searchInput = document.getElementById('searchInput');
+const categoryFilter = document.getElementById('categoryFilter');
+const typeFilter = document.getElementById('typeFilter');
+const periodFilter = document.getElementById('periodFilter');
+
+// Initialisation
+document.addEventListener('DOMContentLoaded', function() {
+    renderTransactions();
+    setupEventListeners();
+    updateDateInput();
+});
+
+function updateDateInput() {
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('date').value = today;
+}
+
+function setupEventListeners() {
+    // Modal
+    addTransactionBtn.addEventListener('click', () => openModal());
+    closeModal.addEventListener('click', () => closeModalFunc());
+    cancelBtn.addEventListener('click', () => closeModalFunc());
+    
+    // Fermer modal en cliquant en dehors
+    transactionModal.addEventListener('click', (e) => {
+        if (e.target === transactionModal) {
+            closeModalFunc();
+        }
+    });
+
+    // Formulaire
+    transactionForm.addEventListener('submit', handleFormSubmit);
+
+    // Filtres
+    searchInput.addEventListener('input', filterTransactions);
+    categoryFilter.addEventListener('change', filterTransactions);
+    typeFilter.addEventListener('change', filterTransactions);
+    periodFilter.addEventListener('change', filterTransactions);
+
+    // Pagination
+    document.getElementById('prevPage').addEventListener('click', () => changePage(-1));
+    document.getElementById('nextPage').addEventListener('click', () => changePage(1));
+
+    // Export
+    document.getElementById('exportBtn').addEventListener('click', exportTransactions);
+}
+
+function openModal(transaction = null) {
+    const modalTitle = document.getElementById('modalTitle');
+    const submitBtn = document.getElementById('submitBtn');
+    
+    if (transaction) {
+        modalTitle.textContent = 'Modifier la transaction';
+        submitBtn.textContent = 'Mettre à jour';
+        fillForm(transaction);
+    } else {
+        modalTitle.textContent = 'Nouvelle transaction';
+        submitBtn.textContent = 'Enregistrer';
+        transactionForm.reset();
+        updateDateInput();
+    }
+    
+    transactionModal.classList.remove('hidden');
+    document.body.style.overflow = 'hidden';
+}
+
+function closeModalFunc() {
+    transactionModal.classList.add('hidden');
+    document.body.style.overflow = 'auto';
+    transactionForm.reset();
+}
+
+function fillForm(transaction) {
+    document.querySelector(`input[name="type"][value="${transaction.type}"]`).checked = true;
+    document.getElementById('amount').value = transaction.amount;
+    document.getElementById('description').value = transaction.description;
+    document.getElementById('category').value = transaction.category;
+    document.getElementById('date').value = transaction.date;
+}
+
+function handleFormSubmit(e) {
+    e.preventDefault();
+    
+    const formData = new FormData(transactionForm);
+    const transactionData = {
+        id: Date.now(), // En production, l'ID viendrait du serveur
+        type: formData.get('type'),
+        amount: parseFloat(formData.get('amount')),
+        description: formData.get('description'),
+        category: formData.get('category'),
+        date: formData.get('date'),
+        icon: getCategoryIcon(formData.get('category')),
+        color: getCategoryColor(formData.get('category'))
+    };
+
+    // Validation
+    if (!validateTransaction(transactionData)) {
+        return;
+    }
+
+    // Ajouter la transaction (en production, envoyer au serveur)
+    transactions.unshift(transactionData);
+    filterTransactions();
+    closeModalFunc();
+    
+    // Afficher message de succès
+    showMessage('Transaction ajoutée avec succès !', 'success');
+}
+
+function validateTransaction(transaction) {
+    if (!transaction.amount || transaction.amount <= 0) {
+        showMessage('Le montant doit être supérieur à 0', 'error');
+        return false;
+    }
+    if (!transaction.description.trim()) {
+        showMessage('La description est obligatoire', 'error');
+        return false;
+    }
+    if (!transaction.category) {
+        showMessage('Veuillez sélectionner une catégorie', 'error');
+        return false;
+    }
+    return true;
+}
+
+function getCategoryIcon(category) {
+    const icons = {
+        'alimentation': 'shopping-cart',
+        'transport': 'car',
+        'loisirs': 'film',
+        'santé': 'pills',
+        'logement': 'home',
+        'salaire': 'university',
+        'autres': 'tag'
+    };
+    return icons[category] || 'tag';
+}
+
+function getCategoryColor(category) {
+    const colors = {
+        'alimentation': 'red',
+        'transport': 'blue',
+        'loisirs': 'purple',
+        'santé': 'orange',
+        'logement': 'red',
+        'salaire': 'green',
+        'autres': 'gray'
+    };
+    return colors[category] || 'gray';
+}
+
+function filterTransactions() {
+    const search = searchInput.value.toLowerCase();
+    const categoryValue = categoryFilter.value;
+    const typeValue = typeFilter.value;
+    const periodValue = periodFilter.value;
+
+    filteredTransactions = transactions.filter(transaction => {
+        // Recherche textuelle
+        if (search && !transaction.description.toLowerCase().includes(search)) {
+            return false;
+        }
+        
+        // Filtre catégorie
+        if (categoryValue && transaction.category !== categoryValue) {
+            return false;
+        }
+        
+        // Filtre type
+        if (typeValue && transaction.type !== typeValue) {
+            return false;
+        }
+        
+        // Filtre période
+        if (periodValue !== 'all') {
+            const transactionDate = new Date(transaction.date);
+            const now = new Date();
+            
+            switch (periodValue) {
+                case 'thisMonth':
+                    if (transactionDate.getMonth() !== now.getMonth() || 
+                        transactionDate.getFullYear() !== now.getFullYear()) {
+                        return false;
+                    }
+                    break;
+                case 'lastMonth':
+                    const lastMonth = new Date(now.getFullYear(), now.getMonth() - 1);
+                    if (transactionDate.getMonth() !== lastMonth.getMonth() || 
+                        transactionDate.getFullYear() !== lastMonth.getFullYear()) {
+                        return false;
+                    }
+                    break;
+                case 'thisYear':
+                    if (transactionDate.getFullYear() !== now.getFullYear()) {
+                        return false;
+                    }
+                    break;
+            }
+        }
+        
+        return true;
+    });
+
+    currentPage = 1;
+    renderTransactions();
+}
+
+function renderTransactions() {
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    const pageTransactions = filteredTransactions.slice(startIndex, endIndex);
+
+    transactionsList.innerHTML = '';
+
+    if (pageTransactions.length === 0) {
+        transactionsList.innerHTML = `
+            <div class="p-8 text-center">
+                <i class="fas fa-search text-4xl text-gray-300 dark:text-gray-600 mb-4"></i>
+                <p class="text-gray-500 dark:text-gray-400">Aucune transaction trouvée</p>
+            </div>
+        `;
+        return;
+    }
+
+    pageTransactions.forEach(transaction => {
+        const transactionElement = createTransactionElement(transaction);
+        transactionsList.appendChild(transactionElement);
+    });
+
+    updatePagination();
+    updateSummary();
+}
+
+function createTransactionElement(transaction) {
+    const div = document.createElement('div');
+    div.className = 'p-6 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors group';
+    
+    const isIncome = transaction.type === 'income';
+    const amountClass = isIncome ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400';
+    const amountPrefix = isIncome ? '+' : '-';
+    const iconBgClass = isIncome ? 'bg-green-100 dark:bg-green-900/30' : `bg-${transaction.color}-100 dark:bg-${transaction.color}-900/30`;
+    const iconClass = isIncome ? 'text-green-600 dark:text-green-400' : `text-${transaction.color}-600 dark:text-${transaction.color}-400`;
+    
+    div.innerHTML = `
+        <div class="flex items-center justify-between">
+            <div class="flex items-center space-x-4">
+                <div class="w-12 h-12 ${iconBgClass} rounded-full flex items-center justify-center">
+                    <i class="fas fa-${transaction.icon} ${iconClass}"></i>
+                </div>
+                <div>
+                    <p class="text-sm font-medium text-gray-900 dark:text-gray-100">${transaction.description}</p>
+                    <p class="text-xs text-gray-600 dark:text-gray-400">
+                        ${getCategoryLabel(transaction.category)} • ${formatDate(transaction.date)}
+                    </p>
+                </div>
+            </div>
+            <div class="flex items-center space-x-4">
+                <div class="text-right">
+                    <p class="text-lg font-semibold ${amountClass}">${amountPrefix}${transaction.amount.toFixed(2)} €</p>
+                    <p class="text-xs text-gray-600 dark:text-gray-400">${transaction.type === 'income' ? 'Revenu' : 'Dépense'}</p>
+                </div>
+                <div class="opacity-0 group-hover:opacity-100 transition-opacity flex space-x-2">
+                    <button onclick="editTransaction(${transaction.id})" class="p-2 text-gray-400 hover:text-primary-600 dark:hover:text-primary-400">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button onclick="deleteTransaction(${transaction.id})" class="p-2 text-gray-400 hover:text-red-600 dark:hover:text-red-400">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    return div;
+}
+
+function getCategoryLabel(category) {
+    const labels = {
+        'alimentation': '🍽️ Alimentation',
+        'transport': '🚗 Transport',
+        'loisirs': '🎭 Loisirs',
+        'santé': '🏥 Santé',
+        'logement': '🏠 Logement',
+        'salaire': '💼 Salaire',
+        'autres': '📦 Autres'
+    };
+    return labels[category] || category;
+}
+
+function formatDate(dateString) {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffTime = Math.abs(now - date);
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    
+    if (diffDays === 1) return "Aujourd'hui";
+    if (diffDays === 2) return "Hier";
+    if (diffDays <= 7) return `Il y a ${diffDays - 1} jours`;
+    
+    return date.toLocaleDateString('fr-FR', { 
+        day: 'numeric', 
+        month: 'short',
+        year: date.getFullYear() !== now.getFullYear() ? 'numeric' : undefined
+    });
+}
+
+function updatePagination() {
+    const totalPages = Math.ceil(filteredTransactions.length / itemsPerPage);
+    const showingFrom = (currentPage - 1) * itemsPerPage + 1;
+    const showingTo = Math.min(currentPage * itemsPerPage, filteredTransactions.length);
+    
+    document.getElementById('showingFrom').textContent = showingFrom;
+    document.getElementById('showingTo').textContent = showingTo;
+    document.getElementById('totalTransactions').textContent = filteredTransactions.length;
+    document.getElementById('transactionCount').textContent = `${filteredTransactions.length} transaction${filteredTransactions.length > 1 ? 's' : ''}`;
+    
+    document.getElementById('prevPage').disabled = currentPage === 1;
+    document.getElementById('nextPage').disabled = currentPage === totalPages || totalPages === 0;
+}
+
+function updateSummary() {
+    // Calculer les totaux pour les transactions filtrées
+    const income = filteredTransactions
+        .filter(t => t.type === 'income')
+        .reduce((sum, t) => sum + t.amount, 0);
+    
+    const expenses = filteredTransactions
+        .filter(t => t.type === 'expense')
+        .reduce((sum, t) => sum + t.amount, 0);
+    
+    const balance = income - expenses;
+    
+    // Mettre à jour l'affichage (si vous voulez que les résumés changent avec les filtres)
+    // Cette partie peut être optionnelle selon vos besoins
+}
+
+function changePage(direction) {
+    const totalPages = Math.ceil(filteredTransactions.length / itemsPerPage);
+    const newPage = currentPage + direction;
+    
+    if (newPage >= 1 && newPage <= totalPages) {
+        currentPage = newPage;
+        renderTransactions();
+    }
+}
+
+function editTransaction(id) {
+    const transaction = transactions.find(t => t.id === id);
+    if (transaction) {
+        openModal(transaction);
+    }
+}
+
+function deleteTransaction(id) {
+    if (confirm('Êtes-vous sûr de vouloir supprimer cette transaction ?')) {
+        const index = transactions.findIndex(t => t.id === id);
+        if (index > -1) {
+            transactions.splice(index, 1);
+            filterTransactions();
+            showMessage('Transaction supprimée avec succès !', 'success');
+        }
+    }
+}
+
+function exportTransactions() {
+    // Créer le CSV
+    const headers = ['Date', 'Description', 'Catégorie', 'Type', 'Montant'];
+    const csvContent = [
+        headers.join(','),
+        ...filteredTransactions.map(t => [
+            t.date,
+            `"${t.description}"`,
+            t.category,
+            t.type === 'income' ? 'Revenu' : 'Dépense',
+            t.amount
+        ].join(','))
+    ].join('\n');
+    
+    // Télécharger le fichier
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    link.setAttribute('href', url);
+    link.setAttribute('download', 'transactions.csv');
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    showMessage('Export terminé !', 'success');
+}
+
+function showMessage(message, type) {
+    // Supprimer les anciens messages
+    const existingMessages = document.querySelectorAll('.message-alert');
+    existingMessages.forEach(msg => msg.remove());
+    
+    const alertDiv = document.createElement('div');
+    alertDiv.className = `message-alert fixed top-4 right-4 p-4 rounded-lg shadow-lg z-50 ${
+        type === 'success' 
+            ? 'bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 text-green-800 dark:text-green-200' 
+            : 'bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-800 dark:text-red-200'
+    }`;
+    
+    alertDiv.innerHTML = `
+        <div class="flex items-center">
+            <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'} mr-3"></i>
+            <span>${message}</span>
+            <button onclick="this.parentElement.parentElement.remove()" class="ml-4 text-current opacity-70 hover:opacity-100">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+    `;
+    
+    document.body.appendChild(alertDiv);
+    
+    // Auto-supprimer après 5 secondes
+    setTimeout(() => {
+        if (alertDiv.parentNode) {
+            alertDiv.remove();
+        }
+    }, 5000);
+}
+
+// Rendre les fonctions globales pour les boutons
+window.editTransaction = editTransaction;
+window.deleteTransaction = deleteTransaction;
+</script>

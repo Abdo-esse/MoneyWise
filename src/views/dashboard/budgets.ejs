@@ -1,0 +1,654 @@
+<!-- views/dashboard/budgets.ejs -->
+<% 
+const title = "Budgets - Dashboard MoneyWise";
+const pageTitle = "Budgets";
+%>
+
+<!-- Header avec bouton d'ajout -->
+<div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8">
+    <div>
+        <h1 class="text-2xl font-bold text-gray-900 dark:text-gray-100">Budgets</h1>
+        <p class="text-gray-600 dark:text-gray-400 mt-1">Gérez vos budgets mensuels par catégorie</p>
+    </div>
+    <button id="addBudgetBtn" class="mt-4 sm:mt-0 px-6 py-3 bg-primary-600 hover:bg-primary-700 text-white rounded-lg font-medium transition-colors flex items-center">
+        <i class="fas fa-plus mr-2"></i>
+        Nouveau budget
+    </button>
+</div>
+
+<!-- Vue d'ensemble -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+    <!-- Budget Total -->
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+        <div class="flex items-center justify-between">
+            <div>
+                <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Budget Total</p>
+                <p class="text-2xl font-bold text-gray-900 dark:text-gray-100 mt-1">2,150 €</p>
+            </div>
+            <div class="w-12 h-12 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center">
+                <i class="fas fa-calculator text-blue-600 dark:text-blue-400"></i>
+            </div>
+        </div>
+    </div>
+
+    <!-- Dépensé -->
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+        <div class="flex items-center justify-between">
+            <div>
+                <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Dépensé ce mois</p>
+                <p class="text-2xl font-bold text-orange-600 dark:text-orange-400 mt-1">1,650 €</p>
+                <p class="text-xs text-gray-600 dark:text-gray-400 mt-1">77% du budget</p>
+            </div>
+            <div class="w-12 h-12 bg-orange-100 dark:bg-orange-900/30 rounded-full flex items-center justify-center">
+                <i class="fas fa-credit-card text-orange-600 dark:text-orange-400"></i>
+            </div>
+        </div>
+    </div>
+
+    <!-- Restant -->
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+        <div class="flex items-center justify-between">
+            <div>
+                <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Restant</p>
+                <p class="text-2xl font-bold text-green-600 dark:text-green-400 mt-1">500 €</p>
+                <p class="text-xs text-green-600 dark:text-green-400 mt-1">7 jours restants</p>
+            </div>
+            <div class="w-12 h-12 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center">
+                <i class="fas fa-piggy-bank text-green-600 dark:text-green-400"></i>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Graphique de progression -->
+<div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 mb-8">
+    <div class="flex items-center justify-between mb-6">
+        <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100">Progression des budgets</h3>
+        <div class="flex space-x-2">
+            <button class="px-3 py-1 text-xs font-medium text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-900/20 rounded-full">
+                Ce mois
+            </button>
+            <button class="px-3 py-1 text-xs font-medium text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full">
+                Mois dernier
+            </button>
+        </div>
+    </div>
+    <div class="h-64">
+        <canvas id="budgetChart"></canvas>
+    </div>
+</div>
+
+<!-- Liste des budgets -->
+<div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
+    <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+        <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100">Tous les budgets</h3>
+    </div>
+
+    <div id="budgetsList" class="divide-y divide-gray-200 dark:divide-gray-700">
+        <!-- Budget items will be rendered here by JavaScript -->
+    </div>
+</div>
+
+<!-- Modal Ajouter/Modifier Budget -->
+<div id="budgetModal" class="fixed inset-0 z-50 hidden overflow-y-auto">
+    <div class="flex items-center justify-center min-h-screen px-4">
+        <div class="fixed inset-0 bg-black bg-opacity-50 transition-opacity"></div>
+        <div class="relative bg-white dark:bg-gray-800 rounded-xl shadow-xl max-w-lg w-full p-6">
+            <div class="flex items-center justify-between mb-6">
+                <h3 id="budgetModalTitle" class="text-lg font-semibold text-gray-900 dark:text-gray-100">Nouveau budget</h3>
+                <button id="closeBudgetModal" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <form id="budgetForm" class="space-y-4">
+                <!-- Catégorie -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Catégorie *</label>
+                    <select id="budgetCategory" name="category" required
+                            class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
+                        <option value="">Sélectionner une catégorie</option>
+                        <option value="alimentation">🍽️ Alimentation</option>
+                        <option value="transport">🚗 Transport</option>
+                        <option value="loisirs">🎭 Loisirs</option>
+                        <option value="santé">🏥 Santé</option>
+                        <option value="logement">🏠 Logement</option>
+                        <option value="vetements">👕 Vêtements</option>
+                        <option value="education">📚 Éducation</option>
+                        <option value="autres">📦 Autres</option>
+                    </select>
+                </div>
+
+                <!-- Montant -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Budget mensuel *</label>
+                    <div class="relative">
+                        <input type="number" id="budgetAmount" name="amount" step="0.01" required
+                               class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 pr-12"
+                               placeholder="0.00">
+                        <span class="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-500 dark:text-gray-400">€</span>
+                    </div>
+                </div>
+
+                <!-- Description -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Description</label>
+                    <textarea id="budgetDescription" name="description" rows="3"
+                              class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 resize-none"
+                              placeholder="Description optionnelle du budget..."></textarea>
+                </div>
+
+                <!-- Alertes -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Alertes</label>
+                    <div class="space-y-3">
+                        <label class="flex items-center">
+                            <input type="checkbox" id="alert50" name="alert50" class="mr-3 rounded">
+                            <span class="text-sm">Alerter à 50% du budget</span>
+                        </label>
+                        <label class="flex items-center">
+                            <input type="checkbox" id="alert75" name="alert75" class="mr-3 rounded" checked>
+                            <span class="text-sm">Alerter à 75% du budget</span>
+                        </label>
+                        <label class="flex items-center">
+                            <input type="checkbox" id="alert90" name="alert90" class="mr-3 rounded" checked>
+                            <span class="text-sm">Alerter à 90% du budget</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Boutons -->
+                <div class="flex space-x-4 pt-4">
+                    <button type="button" id="cancelBudgetBtn" class="flex-1 px-4 py-3 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                        Annuler
+                    </button>
+                    <button type="submit" id="submitBudgetBtn" class="flex-1 px-4 py-3 bg-primary-600 hover:bg-primary-700 text-white rounded-lg font-medium transition-colors">
+                        Enregistrer
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+// Données fictives des budgets
+const budgets = [
+    {
+        id: 1,
+        category: 'alimentation',
+        name: 'Alimentation',
+        icon: 'shopping-cart',
+        emoji: '🍽️',
+        amount: 600,
+        spent: 450,
+        color: 'green',
+        description: 'Courses alimentaires mensuelles',
+        alerts: { alert50: true, alert75: true, alert90: true }
+    },
+    {
+        id: 2,
+        category: 'transport',
+        name: 'Transport',
+        icon: 'car',
+        emoji: '🚗',
+        amount: 300,
+        spent: 320,
+        color: 'blue',
+        description: 'Essence, transports en commun',
+        alerts: { alert50: false, alert75: true, alert90: true }
+    },
+    {
+        id: 3,
+        category: 'loisirs',
+        name: 'Loisirs',
+        icon: 'film',
+        emoji: '🎭',
+        amount: 250,
+        spent: 180,
+        color: 'purple',
+        description: 'Sorties, cinéma, restaurants',
+        alerts: { alert50: true, alert75: true, alert90: true }
+    },
+    {
+        id: 4,
+        category: 'logement',
+        name: 'Logement',
+        icon: 'home',
+        emoji: '🏠',
+        amount: 900,
+        spent: 850,
+        color: 'red',
+        description: 'Loyer et charges',
+        alerts: { alert50: false, alert75: true, alert90: true }
+    },
+    {
+        id: 5,
+        category: 'santé',
+        name: 'Santé',
+        icon: 'pills',
+        emoji: '🏥',
+        amount: 200,
+        spent: 89.50,
+        color: 'orange',
+        description: 'Médecin, pharmacie, soins',
+        alerts: { alert50: true, alert75: true, alert90: true }
+    },
+    {
+        id: 6,
+        category: 'vetements',
+        name: 'Vêtements',
+        icon: 'tshirt',
+        emoji: '👕',
+        amount: 150,
+        spent: 0,
+    {
+        id: 6,
+        category: 'vetements',
+        name: 'Vêtements',
+        icon: 'tshirt',
+        emoji: '👕',
+        amount: 150,
+        spent: 0,
+        color: 'pink',
+        description: 'Achats de vêtements',
+        alerts: { alert50: false, alert75: true, alert90: true }
+    }
+];
+
+let currentEditingBudget = null;
+
+// Éléments du DOM
+const budgetsList = document.getElementById('budgetsList');
+const budgetModal = document.getElementById('budgetModal');
+const addBudgetBtn = document.getElementById('addBudgetBtn');
+const closeBudgetModal = document.getElementById('closeBudgetModal');
+const cancelBudgetBtn = document.getElementById('cancelBudgetBtn');
+const budgetForm = document.getElementById('budgetForm');
+
+// Initialisation
+document.addEventListener('DOMContentLoaded', function() {
+    renderBudgets();
+    setupBudgetEventListeners();
+    initBudgetChart();
+});
+
+function setupBudgetEventListeners() {
+    // Modal
+    addBudgetBtn.addEventListener('click', () => openBudgetModal());
+    closeBudgetModal.addEventListener('click', () => closeBudgetModalFunc());
+    cancelBudgetBtn.addEventListener('click', () => closeBudgetModalFunc());
+    
+    // Fermer modal en cliquant en dehors
+    budgetModal.addEventListener('click', (e) => {
+        if (e.target === budgetModal) {
+            closeBudgetModalFunc();
+        }
+    });
+
+    // Formulaire
+    budgetForm.addEventListener('submit', handleBudgetFormSubmit);
+}
+
+function openBudgetModal(budget = null) {
+    const modalTitle = document.getElementById('budgetModalTitle');
+    const submitBtn = document.getElementById('submitBudgetBtn');
+    
+    if (budget) {
+        modalTitle.textContent = 'Modifier le budget';
+        submitBtn.textContent = 'Mettre à jour';
+        fillBudgetForm(budget);
+        currentEditingBudget = budget;
+    } else {
+        modalTitle.textContent = 'Nouveau budget';
+        submitBtn.textContent = 'Enregistrer';
+        budgetForm.reset();
+        currentEditingBudget = null;
+        // Cocher les alertes par défaut
+        document.getElementById('alert75').checked = true;
+        document.getElementById('alert90').checked = true;
+    }
+    
+    budgetModal.classList.remove('hidden');
+    document.body.style.overflow = 'hidden';
+}
+
+function closeBudgetModalFunc() {
+    budgetModal.classList.add('hidden');
+    document.body.style.overflow = 'auto';
+    budgetForm.reset();
+    currentEditingBudget = null;
+}
+
+function fillBudgetForm(budget) {
+    document.getElementById('budgetCategory').value = budget.category;
+    document.getElementById('budgetAmount').value = budget.amount;
+    document.getElementById('budgetDescription').value = budget.description;
+    document.getElementById('alert50').checked = budget.alerts.alert50;
+    document.getElementById('alert75').checked = budget.alerts.alert75;
+    document.getElementById('alert90').checked = budget.alerts.alert90;
+}
+
+function handleBudgetFormSubmit(e) {
+    e.preventDefault();
+    
+    const formData = new FormData(budgetForm);
+    const budgetData = {
+        id: currentEditingBudget ? currentEditingBudget.id : Date.now(),
+        category: formData.get('category'),
+        amount: parseFloat(formData.get('amount')),
+        description: formData.get('description') || '',
+        alerts: {
+            alert50: formData.has('alert50'),
+            alert75: formData.has('alert75'),
+            alert90: formData.has('alert90')
+        }
+    };
+
+    // Validation
+    if (!validateBudget(budgetData)) {
+        return;
+    }
+
+    // Ajouter les propriétés dérivées
+    const categoryInfo = getBudgetCategoryInfo(budgetData.category);
+    budgetData.name = categoryInfo.name;
+    budgetData.icon = categoryInfo.icon;
+    budgetData.emoji = categoryInfo.emoji;
+    budgetData.color = categoryInfo.color;
+    budgetData.spent = currentEditingBudget ? currentEditingBudget.spent : 0;
+
+    if (currentEditingBudget) {
+        // Modification
+        const index = budgets.findIndex(b => b.id === currentEditingBudget.id);
+        if (index > -1) {
+            budgets[index] = { ...budgets[index], ...budgetData };
+        }
+        showBudgetMessage('Budget modifié avec succès !', 'success');
+    } else {
+        // Vérifier si la catégorie existe déjà
+        if (budgets.some(b => b.category === budgetData.category)) {
+            showBudgetMessage('Un budget existe déjà pour cette catégorie', 'error');
+            return;
+        }
+        
+        // Ajout
+        budgets.push(budgetData);
+        showBudgetMessage('Budget créé avec succès !', 'success');
+    }
+
+    renderBudgets();
+    updateBudgetChart();
+    closeBudgetModalFunc();
+}
+
+function validateBudget(budget) {
+    if (!budget.category) {
+        showBudgetMessage('Veuillez sélectionner une catégorie', 'error');
+        return false;
+    }
+    if (!budget.amount || budget.amount <= 0) {
+        showBudgetMessage('Le montant doit être supérieur à 0', 'error');
+        return false;
+    }
+    return true;
+}
+
+function getBudgetCategoryInfo(category) {
+    const categories = {
+        'alimentation': { name: 'Alimentation', icon: 'shopping-cart', emoji: '🍽️', color: 'green' },
+        'transport': { name: 'Transport', icon: 'car', emoji: '🚗', color: 'blue' },
+        'loisirs': { name: 'Loisirs', icon: 'film', emoji: '🎭', color: 'purple' },
+        'santé': { name: 'Santé', icon: 'pills', emoji: '🏥', color: 'orange' },
+        'logement': { name: 'Logement', icon: 'home', emoji: '🏠', color: 'red' },
+        'vetements': { name: 'Vêtements', icon: 'tshirt', emoji: '👕', color: 'pink' },
+        'education': { name: 'Éducation', icon: 'book', emoji: '📚', color: 'indigo' },
+        'autres': { name: 'Autres', icon: 'tag', emoji: '📦', color: 'gray' }
+    };
+    return categories[category] || categories['autres'];
+}
+
+function renderBudgets() {
+    budgetsList.innerHTML = '';
+
+    if (budgets.length === 0) {
+        budgetsList.innerHTML = `
+            <div class="p-8 text-center">
+                <i class="fas fa-wallet text-4xl text-gray-300 dark:text-gray-600 mb-4"></i>
+                <p class="text-gray-500 dark:text-gray-400 mb-4">Aucun budget configuré</p>
+                <button onclick="openBudgetModal()" class="px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-lg text-sm">
+                    Créer mon premier budget
+                </button>
+            </div>
+        `;
+        return;
+    }
+
+    budgets.forEach(budget => {
+        const budgetElement = createBudgetElement(budget);
+        budgetsList.appendChild(budgetElement);
+    });
+}
+
+function createBudgetElement(budget) {
+    const div = document.createElement('div');
+    div.className = 'p-6';
+    
+    const percentage = Math.min((budget.spent / budget.amount) * 100, 100);
+    const remaining = Math.max(budget.amount - budget.spent, 0);
+    const isOverBudget = budget.spent > budget.amount;
+    
+    // Déterminer la couleur de la barre de progression
+    let progressColor = 'bg-green-500';
+    if (percentage >= 90) progressColor = 'bg-red-500';
+    else if (percentage >= 75) progressColor = 'bg-yellow-500';
+    else if (percentage >= 50) progressColor = 'bg-orange-500';
+    
+    div.innerHTML = `
+        <div class="flex items-start justify-between mb-4">
+            <div class="flex items-center space-x-4">
+                <div class="w-12 h-12 bg-${budget.color}-100 dark:bg-${budget.color}-900/30 rounded-full flex items-center justify-center">
+                    <span class="text-lg">${budget.emoji}</span>
+                </div>
+                <div>
+                    <h4 class="text-lg font-semibold text-gray-900 dark:text-gray-100">${budget.name}</h4>
+                    <p class="text-sm text-gray-600 dark:text-gray-400">${budget.description || 'Aucune description'}</p>
+                </div>
+            </div>
+            <div class="flex items-center space-x-2">
+                <button onclick="editBudget(${budget.id})" class="p-2 text-gray-400 hover:text-primary-600 dark:hover:text-primary-400">
+                    <i class="fas fa-edit"></i>
+                </button>
+                <button onclick="deleteBudget(${budget.id})" class="p-2 text-gray-400 hover:text-red-600 dark:hover:text-red-400">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </div>
+        </div>
+        
+        <div class="mb-4">
+            <div class="flex items-center justify-between mb-2">
+                <span class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                    ${budget.spent.toFixed(2)} € / ${budget.amount.toFixed(2)} €
+                </span>
+                <span class="text-sm font-medium ${isOverBudget ? 'text-red-600 dark:text-red-400' : 'text-gray-700 dark:text-gray-300'}">
+                    ${percentage.toFixed(1)}%
+                </span>
+            </div>
+            <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3">
+                <div class="${progressColor} h-3 rounded-full transition-all duration-500" style="width: ${Math.min(percentage, 100)}%"></div>
+            </div>
+            <div class="flex items-center justify-between mt-2 text-xs">
+                <span class="${isOverBudget ? 'text-red-600 dark:text-red-400' : 'text-green-600 dark:text-green-400'}">
+                    ${isOverBudget ? `Dépassé de ${(budget.spent - budget.amount).toFixed(2)} €` : `Reste ${remaining.toFixed(2)} €`}
+                </span>
+                <span class="text-gray-500 dark:text-gray-400">
+                    ${getDaysRemainingInMonth()} jours restants
+                </span>
+            </div>
+        </div>
+        
+        ${getAlertSection(budget, percentage)}
+    `;
+    
+    return div;
+}
+
+function getAlertSection(budget, percentage) {
+    const alerts = [];
+    
+    if (budget.alerts.alert50 && percentage >= 50 && percentage < 75) {
+        alerts.push({ level: 50, color: 'orange', message: '50% du budget atteint' });
+    }
+    if (budget.alerts.alert75 && percentage >= 75 && percentage < 90) {
+        alerts.push({ level: 75, color: 'yellow', message: '75% du budget atteint' });
+    }
+    if (budget.alerts.alert90 && percentage >= 90) {
+        alerts.push({ level: 90, color: 'red', message: percentage >= 100 ? 'Budget dépassé !' : '90% du budget atteint' });
+    }
+    
+    if (alerts.length === 0) return '';
+    
+    const alert = alerts[alerts.length - 1]; // Prendre la plus haute alerte
+    return `
+        <div class="mt-4 p-3 bg-${alert.color}-50 dark:bg-${alert.color}-900/20 border border-${alert.color}-200 dark:border-${alert.color}-800 rounded-lg">
+            <div class="flex items-center">
+                <i class="fas fa-exclamation-triangle text-${alert.color}-600 dark:text-${alert.color}-400 mr-2"></i>
+                <span class="text-sm font-medium text-${alert.color}-800 dark:text-${alert.color}-200">${alert.message}</span>
+            </div>
+        </div>
+    `;
+}
+
+function getDaysRemainingInMonth() {
+    const today = new Date();
+    const lastDayOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+    const diffTime = lastDayOfMonth.getTime() - today.getTime();
+    return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+}
+
+function editBudget(id) {
+    const budget = budgets.find(b => b.id === id);
+    if (budget) {
+        openBudgetModal(budget);
+    }
+}
+
+function deleteBudget(id) {
+    if (confirm('Êtes-vous sûr de vouloir supprimer ce budget ?')) {
+        const index = budgets.findIndex(b => b.id === id);
+        if (index > -1) {
+            budgets.splice(index, 1);
+            renderBudgets();
+            updateBudgetChart();
+            showBudgetMessage('Budget supprimé avec succès !', 'success');
+        }
+    }
+}
+
+function initBudgetChart() {
+    const ctx = document.getElementById('budgetChart').getContext('2d');
+    
+    const chartData = {
+        labels: budgets.map(b => b.name),
+        datasets: [{
+            label: 'Budget',
+            data: budgets.map(b => b.amount),
+            backgroundColor: 'rgba(59, 130, 246, 0.1)',
+            borderColor: 'rgb(59, 130, 246)',
+            borderWidth: 2,
+            fill: false
+        }, {
+            label: 'Dépensé',
+            data: budgets.map(b => b.spent),
+            backgroundColor: 'rgba(239, 68, 68, 0.1)',
+            borderColor: 'rgb(239, 68, 68)',
+            borderWidth: 2,
+            fill: false
+        }]
+    };
+
+    new Chart(ctx, {
+        type: 'line',
+        data: chartData,
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    labels: {
+                        usePointStyle: true,
+                        font: { size: 12 },
+                        color: document.documentElement.classList.contains('dark') ? '#e5e7eb' : '#374151'
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    grid: {
+                        color: document.documentElement.classList.contains('dark') ? '#374151' : '#f3f4f6'
+                    },
+                    ticks: {
+                        color: document.documentElement.classList.contains('dark') ? '#9ca3af' : '#6b7280',
+                        callback: function(value) {
+                            return value + ' €';
+                        }
+                    }
+                },
+                x: {
+                    grid: { display: false },
+                    ticks: {
+                        color: document.documentElement.classList.contains('dark') ? '#9ca3af' : '#6b7280'
+                    }
+                }
+            }
+        }
+    });
+}
+
+function updateBudgetChart() {
+    // En production, vous pourriez vouloir mettre à jour le graphique existant
+    // Pour la simplicité, on recharge la page ou on recrée le graphique
+    const canvas = document.getElementById('budgetChart');
+    const newCanvas = canvas.cloneNode();
+    canvas.parentNode.replaceChild(newCanvas, canvas);
+    newCanvas.id = 'budgetChart';
+    initBudgetChart();
+}
+
+function showBudgetMessage(message, type) {
+    // Supprimer les anciens messages
+    const existingMessages = document.querySelectorAll('.budget-message-alert');
+    existingMessages.forEach(msg => msg.remove());
+    
+    const alertDiv = document.createElement('div');
+    alertDiv.className = `budget-message-alert fixed top-4 right-4 p-4 rounded-lg shadow-lg z-50 ${
+        type === 'success' 
+            ? 'bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 text-green-800 dark:text-green-200' 
+            : 'bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-800 dark:text-red-200'
+    }`;
+    
+    alertDiv.innerHTML = `
+        <div class="flex items-center">
+            <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'} mr-3"></i>
+            <span>${message}</span>
+            <button onclick="this.parentElement.parentElement.remove()" class="ml-4 text-current opacity-70 hover:opacity-100">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+    `;
+    
+    document.body.appendChild(alertDiv);
+    
+    setTimeout(() => {
+        if (alertDiv.parentNode) {
+            alertDiv.remove();
+        }
+    }, 5000);
+}
+
+// Rendre les fonctions globales
+window.openBudgetModal = openBudgetModal;
+window.editBudget = editBudget;
+window.deleteBudget = deleteBudget;
+</script>
