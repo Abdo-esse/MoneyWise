@@ -40,3 +40,36 @@ export const renderBudgets = (req, res) => {
         error: req.flash('error')
     });
 };
+export const renderObjectives = (req, res) => {
+  console.log(req);
+   res.render('dashboard/objectives', {
+        layout: 'layout/dashboard', 
+        title: 'Vue d\'ensemble - Dashboard MoneyWise',
+        pageTitle: 'Vue d\'ensemble',
+        user: req.session.user, 
+        success: req.flash('success'),
+        error: req.flash('error')
+    });
+};
+export const renderProfile = (req, res) => {
+  console.log(req);
+   res.render('dashboard/profile', {
+        layout: 'layout/dashboard', 
+        title: 'Vue d\'ensemble - Dashboard MoneyWise',
+        pageTitle: 'Vue d\'ensemble',
+        user: req.session.user, 
+        success: req.flash('success'),
+        error: req.flash('error')
+    });
+};
+export const renderReports = (req, res) => {
+  console.log(req);
+   res.render('dashboard/reports', {
+        layout: 'layout/dashboard', 
+        title: 'Vue d\'ensemble - Dashboard MoneyWise',
+        pageTitle: 'Vue d\'ensemble',
+        user: req.session.user, 
+        success: req.flash('success'),
+        error: req.flash('error')
+    });
+};

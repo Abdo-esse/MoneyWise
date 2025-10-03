@@ -1,6 +1,13 @@
 // src/routes/dashboard.routes.js
 import express from "express";
-import { renderDashboard, renderTransactions, renderBudgets } from "../controllers/page.controller.js";
+import { 
+    renderDashboard,
+    renderTransactions, 
+    renderBudgets, 
+    renderObjectives, 
+    renderProfile, 
+    renderReports 
+} from "../controllers/page.controller.js";
 import { isAuthenticated } from "../middleware/auth.js";
 
 const router = express.Router();
@@ -9,6 +16,9 @@ const router = express.Router();
 router.get("/", isAuthenticated, renderDashboard);
 router.get("/transactions", isAuthenticated, renderTransactions);
 router.get("/budgets", isAuthenticated, renderBudgets);
+router.get("/objectives", isAuthenticated, renderObjectives);
+router.get("/profile", isAuthenticated, renderProfile);
+router.get("/reports", isAuthenticated, renderReports);
 
 
 export default router;

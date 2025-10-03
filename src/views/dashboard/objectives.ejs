@@ -1,0 +1,733 @@
+<!-- views/dashboard/objectives.ejs -->
+<% 
+const title = "Objectifs d'épargne - Dashboard MoneyWise";
+const pageTitle = "Objectifs d'épargne";
+%>
+
+<!-- Header avec bouton d'ajout -->
+<div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8">
+    <div>
+        <h1 class="text-2xl font-bold text-gray-900 dark:text-gray-100">Objectifs d'épargne</h1>
+        <p class="text-gray-600 dark:text-gray-400 mt-1">Définissez et suivez vos objectifs financiers</p>
+    </div>
+    <button id="addObjectiveBtn" class="mt-4 sm:mt-0 px-6 py-3 bg-primary-600 hover:bg-primary-700 text-white rounded-lg font-medium transition-colors flex items-center">
+        <i class="fas fa-plus mr-2"></i>
+        Nouvel objectif
+    </button>
+</div>
+
+<!-- Vue d'ensemble -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+    <!-- Total Objectifs -->
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+        <div class="flex items-center justify-between">
+            <div>
+                <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Total Objectifs</p>
+                <p class="text-2xl font-bold text-gray-900 dark:text-gray-100 mt-1">29,000 €</p>
+                <p class="text-xs text-gray-600 dark:text-gray-400 mt-1">6 objectifs actifs</p>
+            </div>
+            <div class="w-12 h-12 bg-purple-100 dark:bg-purple-900/30 rounded-full flex items-center justify-center">
+                <i class="fas fa-bullseye text-purple-600 dark:text-purple-400"></i>
+            </div>
+        </div>
+    </div>
+
+    <!-- Épargné -->
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+        <div class="flex items-center justify-between">
+            <div>
+                <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Épargne totale</p>
+                <p class="text-2xl font-bold text-green-600 dark:text-green-400 mt-1">19,400 €</p>
+                <p class="text-xs text-green-600 dark:text-green-400 mt-1">67% de l'objectif</p>
+            </div>
+            <div class="w-12 h-12 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center">
+                <i class="fas fa-piggy-bank text-green-600 dark:text-green-400"></i>
+            </div>
+        </div>
+    </div>
+
+    <!-- À épargner -->
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+        <div class="flex items-center justify-between">
+            <div>
+                <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Reste à épargner</p>
+                <p class="text-2xl font-bold text-orange-600 dark:text-orange-400 mt-1">9,600 €</p>
+                <p class="text-xs text-gray-600 dark:text-gray-400 mt-1">33% restant</p>
+            </div>
+            <div class="w-12 h-12 bg-orange-100 dark:bg-orange-900/30 rounded-full flex items-center justify-center">
+                <i class="fas fa-chart-line text-orange-600 dark:text-orange-400"></i>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Progression globale -->
+<div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 mb-8">
+    <div class="flex items-center justify-between mb-6">
+        <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100">Progression globale</h3>
+        <span class="text-2xl font-bold text-primary-600 dark:text-primary-400">67%</span>
+    </div>
+    <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-4 mb-4">
+        <div class="bg-gradient-to-r from-green-500 to-emerald-500 h-4 rounded-full transition-all duration-500" style="width: 67%"></div>
+    </div>
+    <div class="flex items-center justify-between text-sm text-gray-600 dark:text-gray-400">
+        <span>19,400 € épargnés</span>
+        <span>29,000 € objectif total</span>
+    </div>
+</div>
+
+<!-- Filtres -->
+<div class="flex flex-wrap gap-2 mb-6">
+    <button class="filter-btn px-4 py-2 text-sm font-medium text-white bg-primary-600 rounded-full" data-filter="all">
+        Tous (6)
+    </button>
+    <button class="filter-btn px-4 py-2 text-sm font-medium text-gray-600 dark:text-gray-400 bg-gray-100 dark:bg-gray-700 rounded-full hover:bg-gray-200 dark:hover:bg-gray-600" data-filter="en-cours">
+        En cours (4)
+    </button>
+    <button class="filter-btn px-4 py-2 text-sm font-medium text-gray-600 dark:text-gray-400 bg-gray-100 dark:bg-gray-700 rounded-full hover:bg-gray-200 dark:hover:bg-gray-600" data-filter="termine">
+        Terminés (2)
+    </button>
+</div>
+
+<!-- Liste des objectifs -->
+<div id="objectivesList" class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <!-- Objective items will be rendered here by JavaScript -->
+</div>
+
+<!-- Modal Ajouter/Modifier Objectif -->
+<div id="objectiveModal" class="fixed inset-0 z-50 hidden overflow-y-auto">
+    <div class="flex items-center justify-center min-h-screen px-4">
+        <div class="fixed inset-0 bg-black bg-opacity-50 transition-opacity"></div>
+        <div class="relative bg-white dark:bg-gray-800 rounded-xl shadow-xl max-w-lg w-full p-6">
+            <div class="flex items-center justify-between mb-6">
+                <h3 id="objectiveModalTitle" class="text-lg font-semibold text-gray-900 dark:text-gray-100">Nouvel objectif</h3>
+                <button id="closeObjectiveModal" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <form id="objectiveForm" class="space-y-4">
+                <!-- Nom -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Nom de l'objectif *</label>
+                    <input type="text" id="objectiveName" name="name" required
+                           class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                           placeholder="Ex: Vacances d'été">
+                </div>
+
+                <!-- Icône -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Icône</label>
+                    <div class="grid grid-cols-6 gap-2">
+                        <button type="button" class="icon-btn p-3 border-2 border-gray-300 dark:border-gray-600 rounded-lg hover:border-primary-500 text-2xl" data-icon="🏖️">🏖️</button>
+                        <button type="button" class="icon-btn p-3 border-2 border-gray-300 dark:border-gray-600 rounded-lg hover:border-primary-500 text-2xl" data-icon="🚙">🚙</button>
+                        <button type="button" class="icon-btn p-3 border-2 border-gray-300 dark:border-gray-600 rounded-lg hover:border-primary-500 text-2xl" data-icon="🏠">🏠</button>
+                        <button type="button" class="icon-btn p-3 border-2 border-gray-300 dark:border-gray-600 rounded-lg hover:border-primary-500 text-2xl" data-icon="💍">💍</button>
+                        <button type="button" class="icon-btn p-3 border-2 border-gray-300 dark:border-gray-600 rounded-lg hover:border-primary-500 text-2xl" data-icon="🎓">🎓</button>
+                        <button type="button" class="icon-btn p-3 border-2 border-gray-300 dark:border-gray-600 rounded-lg hover:border-primary-500 text-2xl" data-icon="🚨">🚨</button>
+                        <button type="button" class="icon-btn p-3 border-2 border-gray-300 dark:border-gray-600 rounded-lg hover:border-primary-500 text-2xl" data-icon="💰">💰</button>
+                        <button type="button" class="icon-btn p-3 border-2 border-gray-300 dark:border-gray-600 rounded-lg hover:border-primary-500 text-2xl" data-icon="✈️">✈️</button>
+                        <button type="button" class="icon-btn p-3 border-2 border-gray-300 dark:border-gray-600 rounded-lg hover:border-primary-500 text-2xl" data-icon="🎯">🎯</button>
+                        <button type="button" class="icon-btn p-3 border-2 border-gray-300 dark:border-gray-600 rounded-lg hover:border-primary-500 text-2xl" data-icon="🎁">🎁</button>
+                        <button type="button" class="icon-btn p-3 border-2 border-gray-300 dark:border-gray-600 rounded-lg hover:border-primary-500 text-2xl" data-icon="📱">📱</button>
+                        <button type="button" class="icon-btn p-3 border-2 border-gray-300 dark:border-gray-600 rounded-lg hover:border-primary-500 text-2xl" data-icon="🎸">🎸</button>
+                    </div>
+                    <input type="hidden" id="objectiveIcon" name="icon" value="🎯">
+                </div>
+
+                <!-- Montant cible -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Montant cible *</label>
+                    <div class="relative">
+                        <input type="number" id="objectiveTarget" name="target" step="0.01" required
+                               class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 pr-12"
+                               placeholder="0.00">
+                        <span class="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-500 dark:text-gray-400">€</span>
+                    </div>
+                </div>
+
+                <!-- Montant actuel -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Montant déjà épargné</label>
+                    <div class="relative">
+                        <input type="number" id="objectiveCurrent" name="current" step="0.01" value="0"
+                               class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 pr-12"
+                               placeholder="0.00">
+                        <span class="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-500 dark:text-gray-400">€</span>
+                    </div>
+                </div>
+
+                <!-- Date limite -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Date limite (optionnelle)</label>
+                    <input type="date" id="objectiveDeadline" name="deadline"
+                           class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
+                </div>
+
+                <!-- Description -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Description</label>
+                    <textarea id="objectiveDescription" name="description" rows="3"
+                              class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 resize-none"
+                              placeholder="Décrivez votre objectif..."></textarea>
+                </div>
+
+                <!-- Boutons -->
+                <div class="flex space-x-4 pt-4">
+                    <button type="button" id="cancelObjectiveBtn" class="flex-1 px-4 py-3 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                        Annuler
+                    </button>
+                    <button type="submit" id="submitObjectiveBtn" class="flex-1 px-4 py-3 bg-primary-600 hover:bg-primary-700 text-white rounded-lg font-medium transition-colors">
+                        Enregistrer
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Ajouter au montant -->
+<div id="addAmountModal" class="fixed inset-0 z-50 hidden overflow-y-auto">
+    <div class="flex items-center justify-center min-h-screen px-4">
+        <div class="fixed inset-0 bg-black bg-opacity-50 transition-opacity"></div>
+        <div class="relative bg-white dark:bg-gray-800 rounded-xl shadow-xl max-w-md w-full p-6">
+            <div class="flex items-center justify-between mb-6">
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100">Ajouter à l'épargne</h3>
+                <button id="closeAddAmountModal" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <form id="addAmountForm" class="space-y-4">
+                <input type="hidden" id="targetObjectiveId">
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Montant à ajouter *</label>
+                    <div class="relative">
+                        <input type="number" id="amountToAdd" name="amount" step="0.01" required
+                               class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 pr-12 text-lg"
+                               placeholder="0.00" autofocus>
+                        <span class="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-500 dark:text-gray-400">€</span>
+                    </div>
+                </div>
+
+                <div class="flex space-x-4">
+                    <button type="button" id="cancelAddAmountBtn" class="flex-1 px-4 py-3 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                        Annuler
+                    </button>
+                    <button type="submit" class="flex-1 px-4 py-3 bg-green-600 hover:bg-green-700 text-white rounded-lg font-medium transition-colors">
+                        <i class="fas fa-plus mr-2"></i>Ajouter
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+// Données fictives des objectifs
+const objectives = [
+    {
+        id: 1,
+        name: 'Vacances d\'été',
+        icon: '🏖️',
+        target: 3000,
+        current: 2100,
+        deadline: '2025-07-01',
+        description: 'Voyage en famille à la plage',
+        color: 'blue',
+        status: 'en-cours'
+    },
+    {
+        id: 2,
+        name: 'Nouvelle voiture',
+        icon: '🚙',
+        target: 20000,
+        current: 12500,
+        deadline: '2026-01-01',
+        description: 'Achat d\'une voiture familiale',
+        color: 'green',
+        status: 'en-cours'
+    },
+    {
+        id: 3,
+        name: 'Fonds d\'urgence',
+        icon: '🚨',
+        target: 6000,
+        current: 4800,
+        deadline: null,
+        description: 'Sécurité financière en cas d\'imprévu',
+        color: 'purple',
+        status: 'en-cours'
+    },
+    {
+        id: 4,
+        name: 'Nouvel ordinateur',
+        icon: '📱',
+        target: 1500,
+        current: 1500,
+        deadline: '2025-03-01',
+        description: 'MacBook Pro pour le travail',
+        color: 'indigo',
+        status: 'termine'
+    },
+    {
+        id: 5,
+        name: 'Mariage',
+        icon: '💍',
+        target: 15000,
+        current: 8500,
+        deadline: '2025-09-15',
+        description: 'Célébration du grand jour',
+        color: 'pink',
+        status: 'en-cours'
+    },
+    {
+        id: 6,
+        name: 'Cours de guitare',
+        icon: '🎸',
+        target: 800,
+        current: 800,
+        deadline: '2024-12-31',
+        description: 'Apprendre la guitare',
+        color: 'orange',
+        status: 'termine'
+    }
+];
+
+let currentFilter = 'all';
+let currentEditingObjective = null;
+let selectedIcon = '🎯';
+
+// Éléments du DOM
+const objectivesList = document.getElementById('objectivesList');
+const objectiveModal = document.getElementById('objectiveModal');
+const addAmountModal = document.getElementById('addAmountModal');
+const addObjectiveBtn = document.getElementById('addObjectiveBtn');
+const closeObjectiveModal = document.getElementById('closeObjectiveModal');
+const cancelObjectiveBtn = document.getElementById('cancelObjectiveBtn');
+const objectiveForm = document.getElementById('objectiveForm');
+const closeAddAmountModal = document.getElementById('closeAddAmountModal');
+const cancelAddAmountBtn = document.getElementById('cancelAddAmountBtn');
+const addAmountForm = document.getElementById('addAmountForm');
+
+// Initialisation
+document.addEventListener('DOMContentLoaded', function() {
+    renderObjectives();
+    setupObjectiveEventListeners();
+    setupIconSelection();
+    setupFilterButtons();
+});
+
+function setupObjectiveEventListeners() {
+    // Modals
+    addObjectiveBtn.addEventListener('click', () => openObjectiveModal());
+    closeObjectiveModal.addEventListener('click', () => closeObjectiveModalFunc());
+    cancelObjectiveBtn.addEventListener('click', () => closeObjectiveModalFunc());
+    closeAddAmountModal.addEventListener('click', () => closeAddAmountModalFunc());
+    cancelAddAmountBtn.addEventListener('click', () => closeAddAmountModalFunc());
+    
+    // Fermer modals en cliquant en dehors
+    objectiveModal.addEventListener('click', (e) => {
+        if (e.target === objectiveModal) closeObjectiveModalFunc();
+    });
+    
+    addAmountModal.addEventListener('click', (e) => {
+        if (e.target === addAmountModal) closeAddAmountModalFunc();
+    });
+
+    // Formulaires
+    objectiveForm.addEventListener('submit', handleObjectiveFormSubmit);
+    addAmountForm.addEventListener('submit', handleAddAmountFormSubmit);
+}
+
+function setupIconSelection() {
+    const iconBtns = document.querySelectorAll('.icon-btn');
+    iconBtns.forEach(btn => {
+        btn.addEventListener('click', function() {
+            // Retirer la sélection des autres
+            iconBtns.forEach(b => {
+                b.classList.remove('border-primary-500', 'bg-primary-50', 'dark:bg-primary-900/20');
+                b.classList.add('border-gray-300', 'dark:border-gray-600');
+            });
+            
+            // Ajouter la sélection à celui-ci
+            this.classList.remove('border-gray-300', 'dark:border-gray-600');
+            this.classList.add('border-primary-500', 'bg-primary-50', 'dark:bg-primary-900/20');
+            
+            selectedIcon = this.dataset.icon;
+            document.getElementById('objectiveIcon').value = selectedIcon;
+        });
+    });
+}
+
+function setupFilterButtons() {
+    const filterBtns = document.querySelectorAll('.filter-btn');
+    filterBtns.forEach(btn => {
+        btn.addEventListener('click', function() {
+            // Mettre à jour l'UI des boutons
+            filterBtns.forEach(b => {
+                b.classList.remove('text-white', 'bg-primary-600');
+                b.classList.add('text-gray-600', 'dark:text-gray-400', 'bg-gray-100', 'dark:bg-gray-700');
+            });
+            
+            this.classList.remove('text-gray-600', 'dark:text-gray-400', 'bg-gray-100', 'dark:bg-gray-700');
+            this.classList.add('text-white', 'bg-primary-600');
+            
+            currentFilter = this.dataset.filter;
+            renderObjectives();
+        });
+    });
+}
+
+function openObjectiveModal(objective = null) {
+    const modalTitle = document.getElementById('objectiveModalTitle');
+    const submitBtn = document.getElementById('submitObjectiveBtn');
+    
+    if (objective) {
+        modalTitle.textContent = 'Modifier l\'objectif';
+        submitBtn.textContent = 'Mettre à jour';
+        fillObjectiveForm(objective);
+        currentEditingObjective = objective;
+    } else {
+        modalTitle.textContent = 'Nouvel objectif';
+        submitBtn.textContent = 'Enregistrer';
+        objectiveForm.reset();
+        currentEditingObjective = null;
+        selectedIcon = '🎯';
+        
+        // Réinitialiser la sélection des icônes
+        document.querySelectorAll('.icon-btn').forEach(btn => {
+            btn.classList.remove('border-primary-500', 'bg-primary-50', 'dark:bg-primary-900/20');
+            btn.classList.add('border-gray-300', 'dark:border-gray-600');
+        });
+    }
+    
+    objectiveModal.classList.remove('hidden');
+    document.body.style.overflow = 'hidden';
+}
+
+function closeObjectiveModalFunc() {
+    objectiveModal.classList.add('hidden');
+    document.body.style.overflow = 'auto';
+    objectiveForm.reset();
+    currentEditingObjective = null;
+}
+
+function closeAddAmountModalFunc() {
+    addAmountModal.classList.add('hidden');
+    document.body.style.overflow = 'auto';
+    addAmountForm.reset();
+}
+
+function fillObjectiveForm(objective) {
+    document.getElementById('objectiveName').value = objective.name;
+    document.getElementById('objectiveTarget').value = objective.target;
+    document.getElementById('objectiveCurrent').value = objective.current;
+    document.getElementById('objectiveDeadline').value = objective.deadline || '';
+    document.getElementById('objectiveDescription').value = objective.description;
+    selectedIcon = objective.icon;
+    document.getElementById('objectiveIcon').value = objective.icon;
+    
+    // Sélectionner l'icône correspondante
+    document.querySelectorAll('.icon-btn').forEach(btn => {
+        if (btn.dataset.icon === objective.icon) {
+            btn.classList.remove('border-gray-300', 'dark:border-gray-600');
+            btn.classList.add('border-primary-500', 'bg-primary-50', 'dark:bg-primary-900/20');
+        }
+    });
+}
+
+function handleObjectiveFormSubmit(e) {
+    e.preventDefault();
+    
+    const formData = new FormData(objectiveForm);
+    const objectiveData = {
+        id: currentEditingObjective ? currentEditingObjective.id : Date.now(),
+        name: formData.get('name'),
+        icon: selectedIcon,
+        target: parseFloat(formData.get('target')),
+        current: parseFloat(formData.get('current')) || 0,
+        deadline: formData.get('deadline') || null,
+        description: formData.get('description') || '',
+        color: getRandomColor(),
+        status: 'en-cours'
+    };
+
+    // Validation
+    if (!validateObjective(objectiveData)) {
+        return;
+    }
+
+    // Déterminer le statut
+    if (objectiveData.current >= objectiveData.target) {
+        objectiveData.status = 'termine';
+    }
+
+    if (currentEditingObjective) {
+        // Modification
+        const index = objectives.findIndex(o => o.id === currentEditingObjective.id);
+        if (index > -1) {
+            objectives[index] = { ...objectives[index], ...objectiveData };
+        }
+        showObjectiveMessage('Objectif modifié avec succès !', 'success');
+    } else {
+        // Ajout
+        objectives.push(objectiveData);
+        showObjectiveMessage('Objectif créé avec succès !', 'success');
+    }
+
+    renderObjectives();
+    closeObjectiveModalFunc();
+}
+
+function validateObjective(objective) {
+    if (!objective.name.trim()) {
+        showObjectiveMessage('Le nom est obligatoire', 'error');
+        return false;
+    }
+    if (!objective.target || objective.target <= 0) {
+        showObjectiveMessage('Le montant cible doit être supérieur à 0', 'error');
+        return false;
+    }
+    if (objective.current < 0) {
+        showObjectiveMessage('Le montant actuel ne peut pas être négatif', 'error');
+        return false;
+    }
+    return true;
+}
+
+function getRandomColor() {
+    const colors = ['blue', 'green', 'purple', 'pink', 'indigo', 'orange', 'red', 'yellow'];
+    return colors[Math.floor(Math.random() * colors.length)];
+}
+
+function renderObjectives() {
+    objectivesList.innerHTML = '';
+
+    let filteredObjectives = objectives;
+    if (currentFilter !== 'all') {
+        filteredObjectives = objectives.filter(o => o.status === currentFilter);
+    }
+
+    if (filteredObjectives.length === 0) {
+        objectivesList.innerHTML = `
+            <div class="col-span-full p-8 text-center bg-white dark:bg-gray-800 rounded-xl">
+                <i class="fas fa-bullseye text-4xl text-gray-300 dark:text-gray-600 mb-4"></i>
+                <p class="text-gray-500 dark:text-gray-400 mb-4">Aucun objectif trouvé</p>
+                <button onclick="openObjectiveModal()" class="px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-lg text-sm">
+                    Créer un objectif
+                </button>
+            </div>
+        `;
+        return;
+    }
+
+    filteredObjectives.forEach(objective => {
+        const objectiveElement = createObjectiveElement(objective);
+        objectivesList.appendChild(objectiveElement);
+    });
+}
+
+function createObjectiveElement(objective) {
+    const div = document.createElement('div');
+    
+    const percentage = Math.min((objective.current / objective.target) * 100, 100);
+    const remaining = Math.max(objective.target - objective.current, 0);
+    const isCompleted = objective.status === 'termine';
+    
+    // Couleur du gradient
+    const gradientColors = {
+        'blue': 'from-blue-500 to-cyan-500',
+        'green': 'from-green-500 to-emerald-500',
+        'purple': 'from-purple-500 to-pink-500',
+        'pink': 'from-pink-500 to-rose-500',
+        'indigo': 'from-indigo-500 to-purple-500',
+        'orange': 'from-orange-500 to-red-500',
+        'red': 'from-red-500 to-pink-500',
+        'yellow': 'from-yellow-500 to-orange-500'
+    };
+    
+    const gradient = gradientColors[objective.color] || gradientColors['blue'];
+    
+    div.className = `bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden ${isCompleted ? 'opacity-75' : ''}`;
+    
+    // Formater la date limite
+    let deadlineText = '';
+    if (objective.deadline) {
+        const deadline = new Date(objective.deadline);
+        const now = new Date();
+        const diffTime = deadline - now;
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        
+        if (diffDays < 0) {
+            deadlineText = `<span class="text-red-600 dark:text-red-400"><i class="fas fa-exclamation-triangle mr-1"></i>Échéance dépassée</span>`;
+        } else if (diffDays === 0) {
+            deadlineText = `<span class="text-orange-600 dark:text-orange-400"><i class="fas fa-clock mr-1"></i>Aujourd'hui</span>`;
+        } else if (diffDays <= 7) {
+            deadlineText = `<span class="text-orange-600 dark:text-orange-400"><i class="fas fa-clock mr-1"></i>${diffDays} jour${diffDays > 1 ? 's' : ''} restant${diffDays > 1 ? 's' : ''}</span>`;
+        } else {
+            deadlineText = `<span class="text-gray-600 dark:text-gray-400"><i class="fas fa-calendar mr-1"></i>${deadline.toLocaleDateString('fr-FR')}</span>`;
+        }
+    }
+    
+    div.innerHTML = `
+        <div class="p-6">
+            <div class="flex items-start justify-between mb-4">
+                <div class="flex items-center space-x-4">
+                    <div class="text-4xl">${objective.icon}</div>
+                    <div>
+                        <h4 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-1">
+                            ${objective.name}
+                            ${isCompleted ? '<span class="ml-2 px-2 py-1 text-xs bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 rounded-full"><i class="fas fa-check mr-1"></i>Terminé</span>' : ''}
+                        </h4>
+                        <p class="text-sm text-gray-600 dark:text-gray-400">${objective.description}</p>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <button onclick="editObjective(${objective.id})" class="p-2 text-gray-400 hover:text-primary-600 dark:hover:text-primary-400">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button onclick="deleteObjective(${objective.id})" class="p-2 text-gray-400 hover:text-red-600 dark:hover:text-red-400">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="mb-4">
+                <div class="flex items-center justify-between mb-2">
+                    <span class="text-2xl font-bold bg-gradient-to-r ${gradient} bg-clip-text text-transparent">
+                        ${objective.current.toFixed(2)} €
+                    </span>
+                    <span class="text-sm text-gray-600 dark:text-gray-400">
+                        / ${objective.target.toFixed(2)} €
+                    </span>
+                </div>
+                
+                <div class="relative w-full bg-gray-200 dark:bg-gray-700 rounded-full h-4 mb-2">
+                    <div class="absolute inset-0 bg-gradient-to-r ${gradient} h-4 rounded-full transition-all duration-500" style="width: ${percentage}%"></div>
+                    <div class="absolute inset-0 flex items-center justify-center">
+                        <span class="text-xs font-semibold ${percentage > 50 ? 'text-white' : 'text-gray-700 dark:text-gray-300'}">
+                            ${percentage.toFixed(0)}%
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="flex items-center justify-between text-xs">
+                    <span class="text-gray-600 dark:text-gray-400">
+                        ${isCompleted ? 'Objectif atteint !' : `Reste ${remaining.toFixed(2)} €`}
+                    </span>
+                    <span>${deadlineText}</span>
+                </div>
+            </div>
+            
+            ${!isCompleted ? `
+                <button onclick="openAddAmountModal(${objective.id})" class="w-full px-4 py-2 bg-gradient-to-r ${gradient} hover:opacity-90 text-white rounded-lg font-medium transition-all">
+                    <i class="fas fa-plus mr-2"></i>Ajouter au montant
+                </button>
+            ` : `
+                <div class="w-full px-4 py-2 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 text-green-700 dark:text-green-300 rounded-lg text-center font-medium">
+                    <i class="fas fa-trophy mr-2"></i>Objectif accompli !
+                </div>
+            `}
+        </div>
+    `;
+    
+    return div;
+}
+
+function openAddAmountModal(objectiveId) {
+    document.getElementById('targetObjectiveId').value = objectiveId;
+    addAmountModal.classList.remove('hidden');
+    document.body.style.overflow = 'hidden';
+    
+    // Focus sur l'input
+    setTimeout(() => {
+        document.getElementById('amountToAdd').focus();
+    }, 100);
+}
+
+function handleAddAmountFormSubmit(e) {
+    e.preventDefault();
+    
+    const objectiveId = parseInt(document.getElementById('targetObjectiveId').value);
+    const amountToAdd = parseFloat(document.getElementById('amountToAdd').value);
+    
+    if (!amountToAdd || amountToAdd <= 0) {
+        showObjectiveMessage('Le montant doit être supérieur à 0', 'error');
+        return;
+    }
+    
+    const objective = objectives.find(o => o.id === objectiveId);
+    if (objective) {
+        objective.current += amountToAdd;
+        
+        // Vérifier si l'objectif est atteint
+        if (objective.current >= objective.target) {
+            objective.status = 'termine';
+            showObjectiveMessage(`🎉 Félicitations ! Objectif "${objective.name}" atteint !`, 'success');
+        } else {
+            showObjectiveMessage(`${amountToAdd.toFixed(2)} € ajouté à "${objective.name}"`, 'success');
+        }
+        
+        renderObjectives();
+    }
+    
+    closeAddAmountModalFunc();
+}
+
+function editObjective(id) {
+    const objective = objectives.find(o => o.id === id);
+    if (objective) {
+        openObjectiveModal(objective);
+    }
+}
+
+function deleteObjective(id) {
+    const objective = objectives.find(o => o.id === id);
+    if (confirm(`Êtes-vous sûr de vouloir supprimer l'objectif "${objective.name}" ?`)) {
+        const index = objectives.findIndex(o => o.id === id);
+        if (index > -1) {
+            objectives.splice(index, 1);
+            renderObjectives();
+            showObjectiveMessage('Objectif supprimé avec succès !', 'success');
+        }
+    }
+}
+
+function showObjectiveMessage(message, type) {
+    const existingMessages = document.querySelectorAll('.objective-message-alert');
+    existingMessages.forEach(msg => msg.remove());
+    
+    const alertDiv = document.createElement('div');
+    alertDiv.className = `objective-message-alert fixed top-4 right-4 p-4 rounded-lg shadow-lg z-50 ${
+        type === 'success' 
+            ? 'bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 text-green-800 dark:text-green-200' 
+            : 'bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-800 dark:text-red-200'
+    }`;
+    
+    alertDiv.innerHTML = `
+        <div class="flex items-center">
+            <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'} mr-3"></i>
+            <span>${message}</span>
+            <button onclick="this.parentElement.parentElement.remove()" class="ml-4 text-current opacity-70 hover:opacity-100">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+    `;
+    
+    document.body.appendChild(alertDiv);
+    
+    setTimeout(() => {
+        if (alertDiv.parentNode) {
+            alertDiv.remove();
+        }
+    }, 5000);
+}
+
+// Rendre les fonctions globales
+window.openObjectiveModal = openObjectiveModal;
+window.openAddAmountModal = openAddAmountModal;
+window.editObjective = editObjective;
+window.deleteObjective = deleteObjective;
+</script>

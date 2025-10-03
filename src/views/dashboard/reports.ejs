@@ -1,0 +1,579 @@
+<!-- views/dashboard/reports.ejs -->
+<% 
+const title = "Rapports - Dashboard MoneyWise";
+const pageTitle = "Rapports et Export";
+%>
+
+<!-- Header -->
+<div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8">
+    <div>
+        <h1 class="text-2xl font-bold text-gray-900 dark:text-gray-100">Rapports et Export</h1>
+        <p class="text-gray-600 dark:text-gray-400 mt-1">Analysez vos finances et exportez vos données</p>
+    </div>
+</div>
+
+<!-- Sélection de période -->
+<div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 mb-8">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Période</label>
+            <select id="periodSelect" class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
+                <option value="thisMonth">Ce mois</option>
+                <option value="lastMonth">Mois dernier</option>
+                <option value="last3Months">3 derniers mois</option>
+                <option value="thisYear" selected>Cette année</option>
+                <option value="lastYear">Année dernière</option>
+                <option value="custom">Période personnalisée</option>
+            </select>
+        </div>
+
+        <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Date de début</label>
+            <input type="date" id="startDate" class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
+        </div>
+
+        <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Date de fin</label>
+            <input type="date" id="endDate" class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
+        </div>
+
+        <div class="flex items-end">
+            <button id="generateReportBtn" class="w-full px-6 py-3 bg-primary-600 hover:bg-primary-700 text-white rounded-lg font-medium transition-colors">
+                <i class="fas fa-chart-bar mr-2"></i>Générer
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Stats globales -->
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+        <div class="flex items-center justify-between">
+            <div>
+                <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Revenus totaux</p>
+                <p class="text-2xl font-bold text-green-600 dark:text-green-400 mt-1">+38,400 €</p>
+                <p class="text-xs text-green-600 dark:text-green-400 mt-1">+12% vs période précédente</p>
+            </div>
+            <div class="w-12 h-12 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center">
+                <i class="fas fa-arrow-up text-green-600 dark:text-green-400"></i>
+            </div>
+        </div>
+    </div>
+
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+        <div class="flex items-center justify-between">
+            <div>
+                <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Dépenses totales</p>
+                <p class="text-2xl font-bold text-red-600 dark:text-red-400 mt-1">-22,200 €</p>
+                <p class="text-xs text-red-600 dark:text-red-400 mt-1">+8% vs période précédente</p>
+            </div>
+            <div class="w-12 h-12 bg-red-100 dark:bg-red-900/30 rounded-full flex items-center justify-center">
+                <i class="fas fa-arrow-down text-red-600 dark:text-red-400"></i>
+            </div>
+        </div>
+    </div>
+
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+        <div class="flex items-center justify-between">
+            <div>
+                <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Solde net</p>
+                <p class="text-2xl font-bold text-blue-600 dark:text-blue-400 mt-1">+16,200 €</p>
+                <p class="text-xs text-blue-600 dark:text-blue-400 mt-1">+18% vs période précédente</p>
+            </div>
+            <div class="w-12 h-12 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center">
+                <i class="fas fa-balance-scale text-blue-600 dark:text-blue-400"></i>
+            </div>
+        </div>
+    </div>
+
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+        <div class="flex items-center justify-between">
+            <div>
+                <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Taux d'épargne</p>
+                <p class="text-2xl font-bold text-purple-600 dark:text-purple-400 mt-1">42.2%</p>
+                <p class="text-xs text-purple-600 dark:text-purple-400 mt-1">+5% vs période précédente</p>
+            </div>
+            <div class="w-12 h-12 bg-purple-100 dark:bg-purple-900/30 rounded-full flex items-center justify-center">
+                <i class="fas fa-percent text-purple-600 dark:text-purple-400"></i>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Graphiques -->
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+    <!-- Évolution mensuelle -->
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+        <div class="flex items-center justify-between mb-6">
+            <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100">Évolution mensuelle</h3>
+            <button class="text-sm text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300">
+                <i class="fas fa-download mr-1"></i>Export
+            </button>
+        </div>
+        <div class="h-64">
+            <canvas id="evolutionChart"></canvas>
+        </div>
+    </div>
+
+    <!-- Répartition des dépenses -->
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+        <div class="flex items-center justify-between mb-6">
+            <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100">Répartition des dépenses</h3>
+            <button class="text-sm text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300">
+                <i class="fas fa-download mr-1"></i>Export
+            </button>
+        </div>
+        <div class="h-64">
+            <canvas id="categoryPieChart"></canvas>
+        </div>
+    </div>
+</div>
+
+<!-- Dépenses par catégorie -->
+<div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 mb-8">
+    <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-6">Analyse par catégorie</h3>
+    
+    <div class="space-y-4">
+        <div class="flex items-center">
+            <div class="flex-1">
+                <div class="flex items-center justify-between mb-2">
+                    <span class="text-sm font-medium text-gray-900 dark:text-gray-100">🎭 Loisirs</span>
+                    <span class="text-sm text-gray-600 dark:text-gray-400">2,160 € (9.7%)</span>
+                </div>
+                <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                    <div class="bg-purple-500 h-2 rounded-full" style="width: 9.7%"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Export de données -->
+<div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+    <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-6">Exporter mes données</h3>
+    
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <!-- Export Transactions -->
+        <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-6 hover:border-primary-500 transition-colors">
+            <div class="w-12 h-12 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center mb-4">
+                <i class="fas fa-file-csv text-green-600 dark:text-green-400 text-xl"></i>
+            </div>
+            <h4 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">Transactions</h4>
+            <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">Exportez toutes vos transactions au format CSV</p>
+            <button onclick="exportData('transactions')" class="w-full px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg text-sm font-medium transition-colors">
+                <i class="fas fa-download mr-2"></i>Exporter CSV
+            </button>
+        </div>
+
+        <!-- Export Budgets -->
+        <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-6 hover:border-primary-500 transition-colors">
+            <div class="w-12 h-12 bg-yellow-100 dark:bg-yellow-900/30 rounded-full flex items-center justify-center mb-4">
+                <i class="fas fa-file-excel text-yellow-600 dark:text-yellow-400 text-xl"></i>
+            </div>
+            <h4 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">Budgets</h4>
+            <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">Exportez vos budgets et leur suivi</p>
+            <button onclick="exportData('budgets')" class="w-full px-4 py-2 bg-yellow-600 hover:bg-yellow-700 text-white rounded-lg text-sm font-medium transition-colors">
+                <i class="fas fa-download mr-2"></i>Exporter CSV
+            </button>
+        </div>
+
+        <!-- Export Objectifs -->
+        <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-6 hover:border-primary-500 transition-colors">
+            <div class="w-12 h-12 bg-purple-100 dark:bg-purple-900/30 rounded-full flex items-center justify-center mb-4">
+                <i class="fas fa-file-alt text-purple-600 dark:text-purple-400 text-xl"></i>
+            </div>
+            <h4 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">Objectifs</h4>
+            <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">Exportez vos objectifs d'épargne</p>
+            <button onclick="exportData('objectives')" class="w-full px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg text-sm font-medium transition-colors">
+                <i class="fas fa-download mr-2"></i>Exporter CSV
+            </button>
+        </div>
+
+        <!-- Export Rapport complet -->
+        <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-6 hover:border-primary-500 transition-colors">
+            <div class="w-12 h-12 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center mb-4">
+                <i class="fas fa-file-pdf text-blue-600 dark:text-blue-400 text-xl"></i>
+            </div>
+            <h4 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">Rapport PDF</h4>
+            <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">Rapport financier complet au format PDF</p>
+            <button onclick="exportData('report')" class="w-full px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium transition-colors">
+                <i class="fas fa-download mr-2"></i>Télécharger PDF
+            </button>
+        </div>
+
+        <!-- Export JSON -->
+        <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-6 hover:border-primary-500 transition-colors">
+            <div class="w-12 h-12 bg-indigo-100 dark:bg-indigo-900/30 rounded-full flex items-center justify-center mb-4">
+                <i class="fas fa-code text-indigo-600 dark:text-indigo-400 text-xl"></i>
+            </div>
+            <h4 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">Données JSON</h4>
+            <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">Toutes vos données au format JSON</p>
+            <button onclick="exportData('json')" class="w-full px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm font-medium transition-colors">
+                <i class="fas fa-download mr-2"></i>Exporter JSON
+            </button>
+        </div>
+
+        <!-- Impression -->
+        <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-6 hover:border-primary-500 transition-colors">
+            <div class="w-12 h-12 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center mb-4">
+                <i class="fas fa-print text-gray-600 dark:text-gray-400 text-xl"></i>
+            </div>
+            <h4 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">Imprimer</h4>
+            <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">Imprimez un résumé de vos finances</p>
+            <button onclick="window.print()" class="w-full px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg text-sm font-medium transition-colors">
+                <i class="fas fa-print mr-2"></i>Imprimer
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+// Données pour les graphiques
+const evolutionData = {
+    labels: ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Jun', 'Jul', 'Aoû', 'Sep', 'Oct', 'Nov', 'Déc'],
+    datasets: [{
+        label: 'Revenus',
+        data: [3200, 3100, 3200, 3300, 3150, 3200, 3250, 3200, 3300, 3250, 3200, 3300],
+        borderColor: 'rgb(34, 197, 94)',
+        backgroundColor: 'rgba(34, 197, 94, 0.1)',
+        tension: 0.4,
+        fill: true
+    }, {
+        label: 'Dépenses',
+        data: [1850, 1900, 1800, 1950, 1850, 1900, 1950, 1850, 1900, 1850, 1900, 1800],
+        borderColor: 'rgb(239, 68, 68)',
+        backgroundColor: 'rgba(239, 68, 68, 0.1)',
+        tension: 0.4,
+        fill: true
+    }]
+};
+
+const categoryPieData = {
+    labels: ['Logement', 'Alimentation', 'Transport', 'Loisirs', 'Santé', 'Autres'],
+    datasets: [{
+        data: [10800, 5400, 3840, 2160, 1440, 560],
+        backgroundColor: [
+            'rgb(239, 68, 68)',
+            'rgb(34, 197, 94)',
+            'rgb(59, 130, 246)',
+            'rgb(168, 85, 247)',
+            'rgb(249, 115, 22)',
+            'rgb(156, 163, 175)'
+        ],
+        borderWidth: 0
+    }]
+};
+
+// Initialiser les graphiques
+document.addEventListener('DOMContentLoaded', function() {
+    initCharts();
+    setupDateFilters();
+});
+
+function initCharts() {
+    // Graphique d'évolution
+    const evolutionCtx = document.getElementById('evolutionChart').getContext('2d');
+    new Chart(evolutionCtx, {
+        type: 'line',
+        data: evolutionData,
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    labels: {
+                        usePointStyle: true,
+                        font: { size: 12 },
+                        color: document.documentElement.classList.contains('dark') ? '#e5e7eb' : '#374151'
+                    }
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return context.dataset.label + ': ' + context.parsed.y.toLocaleString() + ' €';
+                        }
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    grid: {
+                        color: document.documentElement.classList.contains('dark') ? '#374151' : '#f3f4f6'
+                    },
+                    ticks: {
+                        color: document.documentElement.classList.contains('dark') ? '#9ca3af' : '#6b7280',
+                        callback: function(value) {
+                            return value.toLocaleString() + ' €';
+                        }
+                    }
+                },
+                x: {
+                    grid: { display: false },
+                    ticks: {
+                        color: document.documentElement.classList.contains('dark') ? '#9ca3af' : '#6b7280'
+                    }
+                }
+            }
+        }
+    });
+
+    // Graphique en camembert
+    const pieCtx = document.getElementById('categoryPieChart').getContext('2d');
+    new Chart(pieCtx, {
+        type: 'doughnut',
+        data: categoryPieData,
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        usePointStyle: true,
+                        padding: 20,
+                        font: { size: 12 },
+                        color: document.documentElement.classList.contains('dark') ? '#e5e7eb' : '#374151'
+                    }
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            const label = context.label || '';
+                            const value = context.parsed || 0;
+                            const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                            const percentage = ((value / total) * 100).toFixed(1);
+                            return label + ': ' + value.toLocaleString() + ' € (' + percentage + '%)';
+                        }
+                    }
+                }
+            }
+        }
+    });
+}
+
+function setupDateFilters() {
+    const periodSelect = document.getElementById('periodSelect');
+    const startDate = document.getElementById('startDate');
+    const endDate = document.getElementById('endDate');
+    const generateBtn = document.getElementById('generateReportBtn');
+
+    // Initialiser les dates
+    const today = new Date();
+    const firstDay = new Date(today.getFullYear(), 0, 1);
+    
+    startDate.value = firstDay.toISOString().split('T')[0];
+    endDate.value = today.toISOString().split('T')[0];
+
+    periodSelect.addEventListener('change', function() {
+        const period = this.value;
+        const today = new Date();
+        let start, end;
+
+        switch(period) {
+            case 'thisMonth':
+                start = new Date(today.getFullYear(), today.getMonth(), 1);
+                end = today;
+                break;
+            case 'lastMonth':
+                start = new Date(today.getFullYear(), today.getMonth() - 1, 1);
+                end = new Date(today.getFullYear(), today.getMonth(), 0);
+                break;
+            case 'last3Months':
+                start = new Date(today.getFullYear(), today.getMonth() - 3, 1);
+                end = today;
+                break;
+            case 'thisYear':
+                start = new Date(today.getFullYear(), 0, 1);
+                end = today;
+                break;
+            case 'lastYear':
+                start = new Date(today.getFullYear() - 1, 0, 1);
+                end = new Date(today.getFullYear() - 1, 11, 31);
+                break;
+            case 'custom':
+                return; // Ne rien changer
+        }
+
+        if (start && end) {
+            startDate.value = start.toISOString().split('T')[0];
+            endDate.value = end.toISOString().split('T')[0];
+        }
+    });
+
+    generateBtn.addEventListener('click', function() {
+        const start = startDate.value;
+        const end = endDate.value;
+        
+        if (!start || !end) {
+            showReportMessage('Veuillez sélectionner une période', 'error');
+            return;
+        }
+
+        if (new Date(start) > new Date(end)) {
+            showReportMessage('La date de début doit être antérieure à la date de fin', 'error');
+            return;
+        }
+
+        showReportMessage('Rapport généré avec succès !', 'success');
+    });
+}
+
+function exportData(type) {
+    const startDate = document.getElementById('startDate').value;
+    const endDate = document.getElementById('endDate').value;
+
+    // Simuler l'export
+    let filename, content;
+
+    switch(type) {
+        case 'transactions':
+            filename = 'transactions.csv';
+            content = generateTransactionsCSV();
+            break;
+        case 'budgets':
+            filename = 'budgets.csv';
+            content = generateBudgetsCSV();
+            break;
+        case 'objectives':
+            filename = 'objectifs.csv';
+            content = generateObjectivesCSV();
+            break;
+        case 'json':
+            filename = 'moneywise_data.json';
+            content = generateJSON();
+            break;
+        case 'report':
+            showReportMessage('Génération du PDF en cours...', 'success');
+            setTimeout(() => {
+                showReportMessage('Rapport PDF téléchargé !', 'success');
+            }, 1500);
+            return;
+        default:
+            return;
+    }
+
+    // Créer et télécharger le fichier
+    const blob = new Blob([content], { type: type === 'json' ? 'application/json' : 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    link.setAttribute('href', url);
+    link.setAttribute('download', filename);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    showReportMessage(`Fichier ${filename} téléchargé !`, 'success');
+}
+
+function generateTransactionsCSV() {
+    return `Date,Description,Catégorie,Type,Montant
+2025-01-30,Carrefour Market,Alimentation,Dépense,-45.67
+2025-01-29,Salaire Janvier,Salaire,Revenu,2850.00
+2025-01-28,Station Total,Transport,Dépense,-62.30
+2025-01-27,Netflix,Loisirs,Dépense,-15.99
+2025-01-25,Épargne Vacances,Épargne,Dépense,-200.00`;
+}
+
+function generateBudgetsCSV() {
+    return `Catégorie,Budget,Dépensé,Restant,Pourcentage
+Alimentation,600,450,150,75%
+Transport,300,320,-20,107%
+Loisirs,250,180,70,72%
+Logement,900,850,50,94%
+Santé,200,89.50,110.50,45%`;
+}
+
+function generateObjectivesCSV() {
+    return `Nom,Objectif,Épargné,Restant,Pourcentage,Date limite
+Vacances d'été,3000,2100,900,70%,2025-07-01
+Nouvelle voiture,20000,12500,7500,62.5%,2026-01-01
+Fonds d'urgence,6000,4800,1200,80%,`;
+}
+
+function generateJSON() {
+    const data = {
+        user: {
+            name: 'Jean Dupont',
+            email: 'jean.dupont@example.com'
+        },
+        summary: {
+            totalIncome: 38400,
+            totalExpenses: 22200,
+            netBalance: 16200,
+            savingsRate: 42.2
+        },
+        transactions: [],
+        budgets: [],
+        objectives: []
+    };
+    return JSON.stringify(data, null, 2);
+}
+
+function showReportMessage(message, type) {
+    const existingMessages = document.querySelectorAll('.report-message-alert');
+    existingMessages.forEach(msg => msg.remove());
+    
+    const alertDiv = document.createElement('div');
+    alertDiv.className = `report-message-alert fixed top-4 right-4 p-4 rounded-lg shadow-lg z-50 ${
+        type === 'success' 
+            ? 'bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 text-green-800 dark:text-green-200' 
+            : 'bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-800 dark:text-red-200'
+    }`;
+    
+    alertDiv.innerHTML = `
+        <div class="flex items-center">
+            <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'} mr-3"></i>
+            <span>${message}</span>
+            <button onclick="this.parentElement.parentElement.remove()" class="ml-4 text-current opacity-70 hover:opacity-100">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+    `;
+    
+    document.body.appendChild(alertDiv);
+    
+    setTimeout(() => {
+        if (alertDiv.parentNode) {
+            alertDiv.remove();
+        }
+    }, 5000);
+}
+</script>100">🍽️ Alimentation</span>
+                    <span class="text-sm text-gray-600 dark:text-gray-400">5,400 € (24.3%)</span>
+                </div>
+                <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                    <div class="bg-green-500 h-2 rounded-full" style="width: 24.3%"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="flex items-center">
+            <div class="flex-1">
+                <div class="flex items-center justify-between mb-2">
+                    <span class="text-sm font-medium text-gray-900 dark:text-gray-100">🏠 Logement</span>
+                    <span class="text-sm text-gray-600 dark:text-gray-400">10,800 € (48.6%)</span>
+                </div>
+                <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                    <div class="bg-red-500 h-2 rounded-full" style="width: 48.6%"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="flex items-center">
+            <div class="flex-1">
+                <div class="flex items-center justify-between mb-2">
+                    <span class="text-sm font-medium text-gray-900 dark:text-gray-100">🚗 Transport</span>
+                    <span class="text-sm text-gray-600 dark:text-gray-400">3,840 € (17.3%)</span>
+                </div>
+                <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                    <div class="bg-blue-500 h-2 rounded-full" style="width: 17.3%"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="flex items-center">
+            <div class="flex-1">
+                <div class="flex items-center justify-between mb-2">
+                    <span class="text-sm font-medium text-gray-900 dark:text-gray-
