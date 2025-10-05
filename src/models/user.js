@@ -1,6 +1,7 @@
 'use strict';
 // src/models/user.js
 import { Model, DataTypes } from 'sequelize';
+import { categoryService } from '../container.js';
 
 export default (sequelize) => {
   class User extends Model {
@@ -65,6 +66,10 @@ export default (sequelize) => {
       updatedAt: 'updated_at'
     }
   );
+
+    User.afterCreate(async (user) => {
+    await categoryService.createDefaultCategories(user.id);
+  });
 
   return User;
 };

@@ -7,9 +7,9 @@ import {
     renderObjectives, 
     renderProfile, 
     renderReports,
-    renderCategories 
 } from "../controllers/page.controller.js";
 import { isAuthenticated } from "../middleware/auth.js";
+import { categoryController } from "../container.js";
 
 const router = express.Router();
 
@@ -20,7 +20,7 @@ router.get("/budgets", isAuthenticated, renderBudgets);
 router.get("/objectives", isAuthenticated, renderObjectives);
 router.get("/profile", isAuthenticated, renderProfile);
 router.get("/reports", isAuthenticated, renderReports);
-router.get("/categories", isAuthenticated, renderCategories);
+router.get("/categories", isAuthenticated, categoryController.getCategories);
 
 
 export default router;

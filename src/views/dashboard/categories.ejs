@@ -150,7 +150,7 @@ const pageTitle = "Gestion des catégories";
                 <!-- Nom -->
                 <div>
                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Nom de la catégorie *</label>
-                    <input type="text" id="categoryName" name="name" required
+                    <input type="text" id="categoryName" name="name" 
                            class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                            placeholder="Ex: Alimentation">
                 </div>
@@ -190,13 +190,16 @@ const pageTitle = "Gestion des catégories";
 </div>
 
 <script>
+
+
+
 // Données fictives des catégories
   const categories = <%- JSON.stringify(categories) %>;
 let currentEditingCategory = null;
 let selectedIcon = '🍽️';
 let filteredCategories = [...categories];
 
-// Éléments DOM
+
 const categoriesTableBody = document.getElementById('categoriesTableBody');
 const categoryModal = document.getElementById('categoryModal');
 const addCategoryBtn = document.getElementById('addCategoryBtn');
@@ -278,7 +281,7 @@ function openCategoryModal(category = null) {
         submitBtn.textContent = 'Enregistrer';
         categoryForm.reset();
         currentEditingCategory = null;
-        selectedIcon = '🍽️';
+        selectedIcon = '-';
         
         // Réinitialiser sélections
         document.querySelectorAll('.cat-icon-btn').forEach(btn => {
@@ -315,39 +318,70 @@ function fillCategoryForm(category) {
     });
     
 }
-
-function handleCategoryFormSubmit(e) {
+function escapeHTML(str) {
+    if (!str) return '';
+    return str
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+}
+async function handleCategoryFormSubmit(e) {
     e.preventDefault();
-    
+
     const formData = new FormData(categoryForm);
     const categoryData = {
-        id: currentEditingCategory ? currentEditingCategory.id : Date.now(),
-        name: formData.get('name'),
-        icon: selectedIcon,
-        description: formData.get('description') || '',
+        id: currentEditingCategory ? currentEditingCategory.id : undefined,
+        name: escapeHTML(formData.get('name')),
+        icon: escapeHTML(selectedIcon),
+        description: escapeHTML(formData.get('description') || ''),
         active: formData.has('active'),
-        transactionCount: currentEditingCategory ? currentEditingCategory.transactionCount : 0,
-        custom: true
+        custom: true,
+        transaction_count: currentEditingCategory ? currentEditingCategory.transaction_count: 0,
     };
 
-    if (!validateCategory(categoryData)) {
-        return;
-    }
+    if (!validateCategory(categoryData)) return;
 
-    if (currentEditingCategory) {
-        const index = categories.findIndex(c => c.id === currentEditingCategory.id);
-        if (index > -1) {
-            categories[index] = { ...categories[index], ...categoryData };
+    try {
+        let response;
+        if (currentEditingCategory) {
+            // Modifier catégorie
+            response = await fetch(`/categories/${currentEditingCategory.id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(categoryData)
+            });
+        } else {
+            // Ajouter nouvelle catégorie
+            response = await fetch('/categories', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(categoryData)
+            });
         }
-        showCategoryMessage('Catégorie modifiée avec succès !', 'success');
-    } else {
-        categories.push(categoryData);
-        showCategoryMessage('Catégorie créée avec succès !', 'success');
-    }
 
-    filterCategories();
-    updateStats();
-    closeCategoryModalFunc();
+        const result = await response.json();
+        if (!response.ok) throw new Error(result.message || 'Erreur lors de la sauvegarde');
+
+        // Mettre à jour le tableau local
+        if (currentEditingCategory) {
+            const index = categories.findIndex(c => c.id === currentEditingCategory.id);
+            if (index > -1) categories[index] = { ...categories[index], ...categoryData, id: currentEditingCategory.id };
+            showCategoryMessage('Catégorie modifiée avec succès !', 'success');
+        } else {
+            console.log(categoryData,result.id )
+            categories.push({ ...categoryData, id: result.id });
+            console.log(categories)
+            showCategoryMessage('Catégorie créée avec succès !', 'success');
+        }
+
+        filterCategories();
+        updateStats();
+        closeCategoryModalFunc();
+    } catch (error) {
+        showCategoryMessage(error.message, 'error');
+    }
 }
 
 function validateCategory(category) {
@@ -372,6 +406,7 @@ function validateCategory(category) {
 
 function renderCategories() {
     categoriesTableBody.innerHTML = '';
+    console.log(filteredCategories)
 
     if (filteredCategories.length === 0) {
         categoriesTableBody.innerHTML = `
@@ -409,16 +444,16 @@ function createCategoryRow(category) {
             </div>
         </td>
         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
-            ${category.transactionCount}
+            ${category.transaction_count}
         </td>
         <td class="px-6 py-4 whitespace-nowrap">
             ${statusBadge}
         </td>
         <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-            <button onclick="editCategory(${category.id})" class="text-primary-600 dark:text-primary-400 hover:text-primary-900 dark:hover:text-primary-300 mr-3">
+            <button  onclick="editCategory('${escapeHTML(category.id)}')" class="text-primary-600 dark:text-primary-400 hover:text-primary-900 dark:hover:text-primary-300 mr-3">
                 <i class="fas fa-edit"></i>
             </button>
-            <button onclick="deleteCategory(${category.id})" class="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300">
+            <button onclick="deleteCategory('${escapeHTML(category.id)}')" class="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300">
                 <i class="fas fa-trash"></i>
             </button>
         </td>
@@ -434,21 +469,31 @@ function editCategory(id) {
     }
 }
 
-function deleteCategory(id) {
+async function deleteCategory(id) {
     const category = categories.find(c => c.id === id);
     
-    if (category.transactionCount > 0) {
-        if (!confirm(`Cette catégorie contient ${category.transactionCount} transaction(s). Êtes-vous sûr de vouloir la supprimer ? Les transactions seront déplacées vers "Autres".`)) {
+    if (category.transaction_count > 0) {
+        if (!confirm(`Cette catégorie contient ${category.transaction_count} transaction(s). Êtes-vous sûr de vouloir la supprimer ? Les transactions seront déplacées vers "Autres".`)) {
             return;
         }
     }
     
-    const index = categories.findIndex(c => c.id === id);
-    if (index > -1) {
-        categories.splice(index, 1);
+     try {
+        const response = await fetch(`/categories/${id}`, {
+            method: 'DELETE'
+        });
+        const result = await response.json();
+        if (!response.ok) throw new Error(result.message || 'Erreur lors de la suppression');
+
+        // Supprimer du tableau local
+        const index = categories.findIndex(c => c.id === id);
+        if (index > -1) categories.splice(index, 1);
+
         filterCategories();
         updateStats();
         showCategoryMessage('Catégorie supprimée avec succès !', 'success');
+    } catch (error) {
+        showCategoryMessage(error.message, 'error');
     }
 }
 
