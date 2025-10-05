@@ -6,7 +6,8 @@ import {
     renderBudgets, 
     renderObjectives, 
     renderProfile, 
-    renderReports 
+    renderReports,
+    renderCategories 
 } from "../controllers/page.controller.js";
 import { isAuthenticated } from "../middleware/auth.js";
 
@@ -19,6 +20,7 @@ router.get("/budgets", isAuthenticated, renderBudgets);
 router.get("/objectives", isAuthenticated, renderObjectives);
 router.get("/profile", isAuthenticated, renderProfile);
 router.get("/reports", isAuthenticated, renderReports);
+router.get("/categories", isAuthenticated, renderCategories);
 
 
 export default router;
