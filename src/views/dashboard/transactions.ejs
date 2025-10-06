@@ -30,19 +30,30 @@ const pageTitle = "Transactions";
         </div>
 
         <!-- Catégorie -->
-        <div>
-            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Catégorie</label>
-            <select id="categoryFilter" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
+            <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                Catégorie
+            </label>
+            
+            <select id="categoryFilter"
+                class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg 
+                    focus:ring-2 focus:ring-primary-500 focus:border-transparent 
+                    bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
+
                 <option value="">Toutes les catégories</option>
-                <option value="alimentation">Alimentation</option>
-                <option value="transport">Transport</option>
-                <option value="loisirs">Loisirs</option>
-                <option value="santé">Santé</option>
-                <option value="logement">Logement</option>
-                <option value="salaire">Salaire</option>
-                <option value="autres">Autres</option>
+
+                <% if (categories && categories.length > 0) { %>
+                <% categories.forEach(cat => { %>
+                    <option value="<%= cat.id %>">
+                    <%= cat.icon ? cat.icon + ' ' : '' %><%= cat.name %>
+                    </option>
+                <% }) %>
+                <% } else { %>
+                <option disabled>Aucune catégorie disponible</option>
+                <% } %>
             </select>
-        </div>
+            </div>
+
 
         <!-- Type -->
         <div>
@@ -191,20 +202,30 @@ const pageTitle = "Transactions";
                 </div>
 
                 <!-- Catégorie -->
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Catégorie *</label>
-                    <select id="category" name="category" required
-                            class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
-                        <option value="">Sélectionner une catégorie</option>
-                        <option value="alimentation">🍽️ Alimentation</option>
-                        <option value="transport">🚗 Transport</option>
-                        <option value="loisirs">🎭 Loisirs</option>
-                        <option value="santé">🏥 Santé</option>
-                        <option value="logement">🏠 Logement</option>
-                        <option value="salaire">💼 Salaire</option>
-                        <option value="autres">📦 Autres</option>
-                    </select>
-                </div>
+               <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Catégorie *
+                </label>
+
+                <select id="category" name="category_id" required
+                    class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg
+                        focus:ring-2 focus:ring-primary-500 focus:border-transparent
+                        bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
+                    
+                    <option value="">Sélectionner une catégorie</option>
+
+                    <% if (categories && categories.length > 0) { %>
+                    <% categories.forEach(cat => { %>
+                        <option value="<%= cat.id %>">
+                        <%= cat.icon ? cat.icon + ' ' : '' %><%= cat.name %>
+                        </option>
+                    <% }) %>
+                    <% } else { %>
+                    <option disabled>Aucune catégorie disponible</option>
+                    <% } %>
+
+                </select>
+              </div>
 
                 <!-- Date -->
                 <div>
@@ -229,19 +250,9 @@ const pageTitle = "Transactions";
 
 <script>
 // Données fictives des transactions
-const transactions = [
-    {id: 1, type: 'expense', amount: 45.67, description: 'Carrefour Market', category: 'alimentation', date: '2024-01-30', icon: 'shopping-cart', color: 'red'},
-    {id: 2, type: 'income', amount: 2850.00, description: 'Salaire Janvier', category: 'salaire', date: '2024-01-29', icon: 'university', color: 'green'},
-    {id: 3, type: 'expense', amount: 62.30, description: 'Station Total', category: 'transport', date: '2024-01-28', icon: 'gas-pump', color: 'blue'},
-    {id: 4, type: 'expense', amount: 15.99, description: 'Netflix', category: 'loisirs', date: '2024-01-27', icon: 'film', color: 'purple'},
-    {id: 5, type: 'expense', amount: 200.00, description: 'Épargne Vacances', category: 'autres', date: '2024-01-25', icon: 'piggy-bank', color: 'yellow'},
-    {id: 6, type: 'expense', amount: 89.50, description: 'Pharmacie', category: 'santé', date: '2024-01-24', icon: 'pills', color: 'orange'},
-    {id: 7, type: 'expense', amount: 125.00, description: 'Restaurant', category: 'loisirs', date: '2024-01-23', icon: 'utensils', color: 'purple'},
-    {id: 8, type: 'expense', amount: 850.00, description: 'Loyer', category: 'logement', date: '2024-01-20', icon: 'home', color: 'red'},
-    // ... plus de transactions fictives
-];
-
+const transactions = <%- JSON.stringify(transactions) %>;
 let filteredTransactions = [...transactions];
+let currentEditingTransaction = null;
 let currentPage = 1;
 const itemsPerPage = 10;
 
@@ -306,10 +317,12 @@ function openModal(transaction = null) {
     if (transaction) {
         modalTitle.textContent = 'Modifier la transaction';
         submitBtn.textContent = 'Mettre à jour';
+        currentEditingTransaction = transaction;
         fillForm(transaction);
     } else {
         modalTitle.textContent = 'Nouvelle transaction';
         submitBtn.textContent = 'Enregistrer';
+        currentEditingTransaction = null;
         transactionForm.reset();
         updateDateInput();
     }
@@ -322,6 +335,7 @@ function closeModalFunc() {
     transactionModal.classList.add('hidden');
     document.body.style.overflow = 'auto';
     transactionForm.reset();
+    currentEditingTransaction = null;
 }
 
 function fillForm(transaction) {
@@ -332,25 +346,62 @@ function fillForm(transaction) {
     document.getElementById('date').value = transaction.date;
 }
 
-function handleFormSubmit(e) {
+async function handleFormSubmit(e) {
     e.preventDefault();
-    
     const formData = new FormData(transactionForm);
     const transactionData = {
-        id: Date.now(), // En production, l'ID viendrait du serveur
+        id: currentEditingTransaction ? currentEditingTransaction.id : undefined,
         type: formData.get('type'),
         amount: parseFloat(formData.get('amount')),
         description: formData.get('description'),
-        category: formData.get('category'),
+        category_id: formData.get('category_id'),
         date: formData.get('date'),
-        icon: getCategoryIcon(formData.get('category')),
-        color: getCategoryColor(formData.get('category'))
     };
 
-    // Validation
     if (!validateTransaction(transactionData)) {
         return;
     }
+
+    try {
+        let response;
+        if (currentEditingTransaction) {
+            // Modifier transaction
+            response = await fetch(`/transactions/${currentEditingTransaction.id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(transactionData)
+            });
+        } else {
+            // Ajouter nouvelle catégorie
+            response = await fetch('/transactions', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(transactionData)
+            });
+        }
+
+        const result = await response.json();
+        console.log(result);
+        if (!response.ok) throw new Error(result.message || 'Erreur lors de la sauvegarde');
+
+        // Mettre à jour le tableau local
+        if (currentEditingTransaction) {
+            const index = transactions.findIndex(t => t.id === currentEditingTransaction.id);
+            if (index > -1) transactions[index] = { ...transactions[index], ...transactionData, id: currentEditingTransaction.id };
+            showMessage('Transaction modifiée avec succès !', 'success');
+        } else {
+            console.log(transactionData,result.id )
+            transactions.push({ ...transactionData, id: result.id,category_name: result.category_name });
+            console.log(transactions)
+            showMessage('Transaction créée avec succès !', 'success');
+        }
+
+        filterTransactions();
+        closeModalFunc();
+    } catch (error) {
+        showMessage(error.message, 'error');
+    }
+
 
     // Ajouter la transaction (en production, envoyer au serveur)
     transactions.unshift(transactionData);
@@ -370,37 +421,11 @@ function validateTransaction(transaction) {
         showMessage('La description est obligatoire', 'error');
         return false;
     }
-    if (!transaction.category) {
+    if (!transaction.category_id) {
         showMessage('Veuillez sélectionner une catégorie', 'error');
         return false;
     }
     return true;
-}
-
-function getCategoryIcon(category) {
-    const icons = {
-        'alimentation': 'shopping-cart',
-        'transport': 'car',
-        'loisirs': 'film',
-        'santé': 'pills',
-        'logement': 'home',
-        'salaire': 'university',
-        'autres': 'tag'
-    };
-    return icons[category] || 'tag';
-}
-
-function getCategoryColor(category) {
-    const colors = {
-        'alimentation': 'red',
-        'transport': 'blue',
-        'loisirs': 'purple',
-        'santé': 'orange',
-        'logement': 'red',
-        'salaire': 'green',
-        'autres': 'gray'
-    };
-    return colors[category] || 'gray';
 }
 
 function filterTransactions() {
@@ -484,6 +509,15 @@ function renderTransactions() {
     updatePagination();
     updateSummary();
 }
+function escapeHTML(str) {
+    if (!str) return '';
+    return str
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+}
 
 function createTransactionElement(transaction) {
     const div = document.createElement('div');
@@ -492,38 +526,34 @@ function createTransactionElement(transaction) {
     const isIncome = transaction.type === 'income';
     const amountClass = isIncome ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400';
     const amountPrefix = isIncome ? '+' : '-';
-    const iconBgClass = isIncome ? 'bg-green-100 dark:bg-green-900/30' : `bg-${transaction.color}-100 dark:bg-${transaction.color}-900/30`;
-    const iconClass = isIncome ? 'text-green-600 dark:text-green-400' : `text-${transaction.color}-600 dark:text-${transaction.color}-400`;
     
-    div.innerHTML = `
-        <div class="flex items-center justify-between">
-            <div class="flex items-center space-x-4">
-                <div class="w-12 h-12 ${iconBgClass} rounded-full flex items-center justify-center">
-                    <i class="fas fa-${transaction.icon} ${iconClass}"></i>
-                </div>
-                <div>
-                    <p class="text-sm font-medium text-gray-900 dark:text-gray-100">${transaction.description}</p>
-                    <p class="text-xs text-gray-600 dark:text-gray-400">
-                        ${getCategoryLabel(transaction.category)} • ${formatDate(transaction.date)}
-                    </p>
-                </div>
-            </div>
-            <div class="flex items-center space-x-4">
-                <div class="text-right">
-                    <p class="text-lg font-semibold ${amountClass}">${amountPrefix}${transaction.amount.toFixed(2)} €</p>
-                    <p class="text-xs text-gray-600 dark:text-gray-400">${transaction.type === 'income' ? 'Revenu' : 'Dépense'}</p>
-                </div>
-                <div class="opacity-0 group-hover:opacity-100 transition-opacity flex space-x-2">
-                    <button onclick="editTransaction(${transaction.id})" class="p-2 text-gray-400 hover:text-primary-600 dark:hover:text-primary-400">
-                        <i class="fas fa-edit"></i>
-                    </button>
-                    <button onclick="deleteTransaction(${transaction.id})" class="p-2 text-gray-400 hover:text-red-600 dark:hover:text-red-400">
-                        <i class="fas fa-trash"></i>
-                    </button>
-                </div>
+    const amount = parseFloat(transaction.amount); // Convertir en nombre
+div.innerHTML = `
+    <div class="flex items-center justify-between">
+        <div class="flex items-center space-x-4">
+            <div>
+                <p class="text-sm font-medium text-gray-900 dark:text-gray-100">${transaction.description}</p>
+                <p class="text-xs text-gray-600 dark:text-gray-400">
+                    ${transaction.category_name} • ${formatDate(transaction.date)}
+                </p>
             </div>
         </div>
-    `;
+        <div class="flex items-center space-x-4">
+            <div class="text-right">
+                <p class="text-lg font-semibold ${amountClass}">${amountPrefix}${amount.toFixed(2)} €</p>
+                <p class="text-xs text-gray-600 dark:text-gray-400">${transaction.type === 'income' ? 'Revenu' : 'Dépense'}</p>
+            </div>
+            <div class="opacity-0 group-hover:opacity-100 transition-opacity flex space-x-2">
+                <button onclick="editTransaction('${escapeHTML(transaction.id)}')" class="p-2 text-gray-400 hover:text-primary-600 dark:hover:text-primary-400">
+                    <i class="fas fa-edit"></i>
+                </button>
+                <button onclick="deleteTransaction('${escapeHTML(transaction.id)}')" class="p-2 text-gray-400 hover:text-red-600 dark:hover:text-red-400">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+`;
     
     return div;
 }

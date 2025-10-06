@@ -10,6 +10,7 @@ import {renderForgotPassword} from "./controllers/auth/forgotPassword.controller
 import authRoutes from './routes/auth.routes.js';
 import dashboardRoutes from './routes/dashboard.routes.js';
 import categoriesRoutes from './routes/categories.routes.js';
+import transactionsRoutes from './routes/transactions.routes.js';
 import session from 'express-session';
 import flash from 'connect-flash';
 import { flashMiddleware } from './middleware/flashMessages.js';
@@ -61,6 +62,7 @@ app.get('/', (req, res) => {
 app.use('/auth', authRoutes);
 app.use('/dashboard', dashboardRoutes);
 app.use('/categories', categoriesRoutes);
+app.use('/transactions', transactionsRoutes);
 app.get('/home', renderHome);
 app.get('/about', renderAbout);
 app.get('/tests', renderHome);

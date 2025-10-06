@@ -8,7 +8,6 @@ export const renderAbout = (req, res) => {
 };
 
 export const renderDashboard = (req, res) => {
-  console.log(req);
    res.render('dashboard/index', {
         layout: 'layout/dashboard', 
         title: 'Vue d\'ensemble - Dashboard MoneyWise',
@@ -19,7 +18,6 @@ export const renderDashboard = (req, res) => {
     });
 };
 export const renderTransactions = (req, res) => {
-  console.log(req);
    res.render('dashboard/transactions', {
         layout: 'layout/dashboard', 
         title: 'Vue d\'ensemble - Dashboard MoneyWise',
@@ -30,7 +28,6 @@ export const renderTransactions = (req, res) => {
     });
 };
 export const renderBudgets = (req, res) => {
-  console.log(req);
    res.render('dashboard/budgets', {
         layout: 'layout/dashboard', 
         title: 'Vue d\'ensemble - Dashboard MoneyWise',
@@ -41,7 +38,6 @@ export const renderBudgets = (req, res) => {
     });
 };
 export const renderObjectives = (req, res) => {
-  console.log(req);
    res.render('dashboard/objectives', {
         layout: 'layout/dashboard', 
         title: 'Vue d\'ensemble - Dashboard MoneyWise',
@@ -52,7 +48,6 @@ export const renderObjectives = (req, res) => {
     });
 };
 export const renderProfile = (req, res) => {
-  console.log(req);
    res.render('dashboard/profile', {
         layout: 'layout/dashboard', 
         title: 'Vue d\'ensemble - Dashboard MoneyWise',
@@ -63,7 +58,6 @@ export const renderProfile = (req, res) => {
     });
 };
 export const renderReports = (req, res) => {
-  console.log(req);
    res.render('dashboard/reports', {
         layout: 'layout/dashboard', 
         title: 'Vue d\'ensemble - Dashboard MoneyWise',

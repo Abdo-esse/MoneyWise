@@ -370,9 +370,7 @@ async function handleCategoryFormSubmit(e) {
             if (index > -1) categories[index] = { ...categories[index], ...categoryData, id: currentEditingCategory.id };
             showCategoryMessage('Catégorie modifiée avec succès !', 'success');
         } else {
-            console.log(categoryData,result.id )
             categories.push({ ...categoryData, id: result.id });
-            console.log(categories)
             showCategoryMessage('Catégorie créée avec succès !', 'success');
         }
 
@@ -406,7 +404,6 @@ function validateCategory(category) {
 
 function renderCategories() {
     categoriesTableBody.innerHTML = '';
-    console.log(filteredCategories)
 
     if (filteredCategories.length === 0) {
         categoriesTableBody.innerHTML = `

@@ -21,6 +21,9 @@ export class CategoryService {
   async deleteCategory(id) {
     return await this.categoryRepository.delete(id);
   }
+  async getCategoryById(id) {
+    return await this.categoryRepository.findById(id);
+  }
 
   async createDefaultCategories(userId) {
     const defaultCategories = [
