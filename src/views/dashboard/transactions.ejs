@@ -339,11 +339,14 @@ function closeModalFunc() {
 }
 
 function fillForm(transaction) {
+    console.log(transaction);
+    const formatted = new Date(transaction.date).toISOString().split('T')[0];
+    console.log(formatted);
     document.querySelector(`input[name="type"][value="${transaction.type}"]`).checked = true;
     document.getElementById('amount').value = transaction.amount;
     document.getElementById('description').value = transaction.description;
-    document.getElementById('category').value = transaction.category;
-    document.getElementById('date').value = transaction.date;
+    document.getElementById('category').value = transaction.category_id;
+    document.getElementById('date').value = formatted;
 }
 
 async function handleFormSubmit(e) {
