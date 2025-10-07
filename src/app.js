@@ -40,7 +40,7 @@ app.use(flash());
 // Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname,'public')));
 app.use(flashMiddleware);
 
 // Connection DB
@@ -71,6 +71,8 @@ app.get('/session-test', (req, res) => {
     res.json(req.session);
 });
 
+console.log('__dirname',__dirname)
+console.log('__filename',__filename)
 // Lancer le serveur
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
